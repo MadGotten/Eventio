@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}- {{ event.title }}{% endblock %}
+
+{% block base_content %}
+    <h2>Buy ticket for {{ event.title }}</h2>
+    <form method="post"
+          x-data="{ quantity: 1, price: {{ event.ticket.price }} }"
+          x-init="$watch('quantity', value => { if (value < 1) {quantity = 1} else if (value > {{ event.ticket.quantity }}) { quantity={{ event.ticket.quantity }} } })">
+        {% csrf_token %}
+        <p>Tickets left: {{ event.ticket.quantity }}</p>
+        <p class="flex flex-row gap-4 items-center">
+            <span>Price: <span x-text="price"></span>$</span><span>{{ form.ticket_quantity }}</span>
+        </p>
+        <p>
+            Total Price: <span x-text="quantity * price"></span>$
+        </p>
+        <button class="btn-primary hover:!bg-yellow-500 !bg-yellow-400" type="submit">Proceed payment</button>
+    </form>
+{% endblock %}

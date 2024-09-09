@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block base_content %}
+    <div class="min-h-[25dvh] text-lg md:text-xl flex items-center">
+        <h1 class="text-center leading-tight">
+            Your favourites <u class="bg-black text-white px-2">Events</u> in
+            <br>
+            just one place
+        </h1>
+    </div>
+    <form action="{% url 'event_search' %}"
+          class="flex flex-nowrap overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,0.9)] bg-black border-black border-2 rounded min-w-52 max-w-96 w-full"
+          hx-push-url="true"
+          hx-params="q">
+        <input type="text"
+               name="q"
+               placeholder="Search for event"
+               class="py-2 px-3 rounded-s focus:ring-0 border-0 font-medium w-full" />
+        <button class="border-l-2 text-text border-black py-2 px-3 bg-black text-white text-base font-semibold"
+                type="submit">Search</button>
+    </form>
+    <div class="w-full flex flex-col">
+        {% if popular %}
+            <h2 class="text-2xl sm:text-3xl">Popular Events</h2>
+            <div class="flex flex-row flex-wrap gap-4 lg:gap-6 justify-center">
+                {% for event in popular %}
+                    <a href="{% url 'event_detail' event.pk %}"
+                       class="flex flex-col gap-1 bg-neoviolet border-black border-2 no-underline w-56 sm:w-64 lg:w-72 rounded shadow-dark hover:-translate-y-1 transition-transform">
+                        <img {% if event.banner %}src="{{ event.banner.url }}"{% else %}src="{% static 'images/default.jpg' %}"{% endif %}
+                             alt="event banner"
+                             class="m-0 w-full h-48 sm:h-56 lg:h-64 bg-gray-200 object-fill" />
+                        <div class="px-4 py-2">
+                            <div class="flex flex-row justify-between text-lg font-semibold text-nowrap gap-2">
+                                <span class="text-ellipsis overflow-hidden">{{ event.title }}</span>
+                                {% if event.is_paid %}<span>{{ event.ticket.price }}$</span>{% endif %}
+                            </div>
+                            <p class="m-0 mt-1 text-base text-gray-800 text-ellipsis overflow-hidden text-nowrap">
+                                {{ event.date|date:"d.m.Y H:i" }}
+                            </p>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% if events %}
+            <h2 class="text-2xl sm:text-3xl">New favourites</h2>
+            <div class="flex flex-row flex-wrap gap-6 justify-center">
+                {% for event in events|slice:":4" %}
+                    <a href="{% url 'event_detail' event.pk %}"
+                       class="flex flex-col gap-1 bg-yellow-400 border-black border-2 no-underline w-56 sm:w-64 lg:w-72 rounded shadow-dark hover:-translate-y-1 transition-transform">
+                        <img {% if event.banner %}src="{{ event.banner.url }}"{% else %}src="{% static 'images/default.jpg' %}"{% endif %}
+                             alt="event banner"
+                             class="m-0 w-full h-48 sm:h-56 lg:h-64 bg-gray-200 object-fill" />
+                        <div class="px-4 py-2">
+                            <div class="flex flex-row justify-between text-lg font-semibold text-nowrap gap-2">
+                                <span class="text-ellipsis overflow-hidden">{{ event.title }}</span>
+                                {% if event.is_paid %}<span>{{ event.ticket.price }}$</span>{% endif %}
+                            </div>
+                            <p class="m-0 mt-1 text-base text-gray-800 text-ellipsis overflow-hidden text-nowrap">
+                                {{ event.date|date:"d.m.Y H:i" }}
+                            </p>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% if recent %}
+            <h2 class="text-2xl sm:text-3xl">Recent Events</h2>
+            <div class="flex flex-row flex-wrap gap-6 justify-center">{% include 'partials/_recent_events.html' %}</div>
+        {% endif %}
+    </div>
+{% endblock %}

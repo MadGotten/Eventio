@@ -1,0 +1,17 @@
+{% for register in registers %}
+    <a href="{{ register.event.get_absolute_url }}" class="no-underline">
+        <li class="shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 border-black border-2 bg-yellow-400 hover:bg-yellow-500 flex flex-col gap-2 w-44 sm:w-48">
+            <span>{{ register.user }}</span>
+            <span>{{ register.event.title }}</span>
+            <span class="font-normal text-sm">{{ register.registered_at|date:"d.m.Y H:i" }}</span>
+        </li>
+    </a>
+{% empty %}
+    <li class="list-none m-0">No registers</li>
+{% endfor %}
+
+{% if registers.has_next %}
+    <button class="btn-primary hover:!bg-yellow-500 !bg-yellow-400 col-span-full w-fit"
+            hx-get="{% url 'account_detail' %}?registers={{ registers.next_page_number }}"
+            hx-swap="outerHTML">Load more</button>
+{% endif %}

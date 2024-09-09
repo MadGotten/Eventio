@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}- Delete Account{% endblock %}
+
+{% block base_content %}
+    <h2>Confirm delete of account {{ user.username }}</h2>
+    <p class="max-w-prose">
+        <span class="font-semibold text-black">Warning:</span>This action is irreversible meaning all of your data, events, tickets and registers will be erased.
+    </p>
+    <form method="post">
+        {% csrf_token %}
+        <button class="btn-primary hover:!bg-red-600 !bg-red-500" type="submit">Confirm Delete</button>
+    </form>
+{% endblock %}

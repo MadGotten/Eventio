@@ -1,0 +1,10 @@
+{% include 'partials/_events.html' with events=recent only %}
+
+{% if recent.has_next %}
+    <div id="recent_target" class="w-full flex justify-center">
+        <button class=" py-2 px-5 bg-gray-200 hover:bg-gray-300 text-black font-semibold rounded no-underline border-2 focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:translate-y-0.5 focus:translate-x-0.5 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.9)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                hx-get="{% url 'event_list' %}?page={{ recent.next_page_number }}"
+                hx-target="#recent_target"
+                hx-swap="outerHTML">Load more</button>
+    </div>
+{% endif %}

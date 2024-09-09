@@ -1,0 +1,27 @@
+{% load static %}
+
+{% for event in events %}
+    <a href="{{ event.get_absolute_url }}"
+       class="flex flex-col gap-1 {% if event.status == 'approved' %}bg-green-500{% else %}bg-blue-500{% endif %} border-black border-2 no-underline w-52 sm:w-56 rounded shadow-dark hover:-translate-y-1 transition-transform">
+        <img {% if event.banner %}src="{{ event.banner.url }}"{% else %}src="{% static 'images/default.jpg' %}"{% endif %}
+             alt="event banner"
+             class="m-0 w-full h-40 bg-gray-200 object-fill" />
+        <div class="px-4 py-2">
+            <div class="flex flex-row justify-between text-base font-semibold text-nowrap gap-2">
+                <span class="text-ellipsis overflow-hidden">{{ event.title }}</span>
+                {% if event.is_paid %}<span>{{ event.ticket.price }}$</span>{% endif %}
+            </div>
+            <p class="m-0 mt-1 text-sm text-gray-800 text-ellipsis overflow-hidden text-nowrap">
+                {{ event.date|date:"d.m.Y H:i" }}
+            </p>
+        </div>
+    </a>
+{% empty %}
+    <span class="font-medium text-black">No {{ request.GET.status|default:"approved" }} events</span>
+{% endfor %}
+
+{% if events.has_next %}
+    <button class="btn-primary {% if request.GET.status == 'approved' or not request.GET.status %}hover:!bg-green-600 !bg-green-500{% else %}hover:!bg-blue-600 !bg-blue-500{% endif %} col-span-full w-fit"
+            hx-get="{% url 'account_detail' %}?status={{ request.GET.status|default:"approved" }}&events={{ events.next_page_number }}"
+            hx-swap="outerHTML">Load more</button>
+{% endif %}

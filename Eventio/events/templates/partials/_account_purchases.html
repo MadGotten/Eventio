@@ -1,0 +1,21 @@
+{% for purchase in purchases %}
+    <a href="{% url 'purchase_detail' purchase.pk %}" class="no-underline">
+        <li class="shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 border-black border-2 bg-neoviolet hover:bg-neoviolet-hover flex flex-col gap-2 w-44 sm:w-48">
+            <span>{{ purchase.user }}</span>
+            <div class="flex justify-between">
+                <span>{{ purchase.ticket.event.title }}</span>
+                <span>{{ purchase.total }}$</span>
+            </div>
+            <span class="font-normal text-sm">{{ purchase.purchased_at|date:"d.m.Y H:i" }}</span>
+        </li>
+    </a>
+{% empty %}
+    <li class="list-none m-0">No tickets</li>
+{% endfor %}
+
+{% if purchases.has_next %}
+    <button class="btn-primary col-span-full w-fit"
+            hx-get="{% url 'account_detail' %}?purchases={{ purchases.next_page_number }}"
+            hx-swap="outerHTML"
+            hx-history="true">Load more</button>
+{% endif %}

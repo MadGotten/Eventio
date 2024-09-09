@@ -1,0 +1,9 @@
+{% load widget_tweaks %}
+
+{% for field in ticket_form %}
+    <div class="flex flex-col">
+        <label for="{{ field.id_for_label }}" class="font-bold">{{ field.label }}</label>
+        {% render_field field placeholder="" class="p-4 focus:!border-black focus:ring-0 border-2 rounded font-medium placeholder-shown:!border-[#6b7280] border-black valid:border-black invalid:border-red-500" %}
+        {% if field.errors %}<div class="prose-sm !text-red-500">{{ field.errors }}</div>{% endif %}
+    </div>
+{% endfor %}

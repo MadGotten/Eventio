@@ -1,0 +1,40 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventio {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/output.css' %}" type="text/css">
+    <script src="{% static 'htmx.min.js' %}" defer></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+    <script>
+        {% if debug %}
+            if (typeof window.htmx !== "undefined") {
+                htmx.on("htmx:afterSettle", function(detail) {
+                    if (
+                        typeof window.djdt !== "undefined"
+                        && detail.target instanceof HTMLBodyElement
+                    ) {
+                        djdt.show_toolbar();
+                    }
+                });
+            }
+        {% endif %}
+    </script>
+</head>
+<body class="min-h-dvh w-full overflow-x-hidden flex flex-col">
+    {% include 'navbar.html' %}
+    <div class="flex justify-center flex-1 flex-grow">
+        <main class="max-w-screen-xl flex flex-col items-center prose mt-[104px] px-4 pb-8 w-full">
+            {% block base_content %}
+            {% endblock %}
+        </main>
+    </div>
+    {% include 'alert.html' %}
+    {% include 'footer.html' %}
+</body>
+</html>

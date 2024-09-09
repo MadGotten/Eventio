@@ -1,0 +1,45 @@
+{% load allauth %}
+<p class="flex flex-col gap-2 w-full">
+    <label for="{{ attrs.id }}" class="font-bold">
+        {% slot label %}
+        {% endslot %}
+    </label>
+    {% if attrs.type == "textarea" %}
+        <textarea {% if attrs.required %}required{% endif %}
+                  {% if attrs.rows %}rows="{{ attrs.rows }}"{% endif %}
+                  {% if attrs.disabled %}disabled{% endif %}
+                  {% if attrs.readonly %}readonly{% endif %}
+                  {% if attrs.checked %}checked{% endif %}
+                  {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
+                  {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
+                  {% if attrs.placeholder %}placeholder="{{ attrs.placeholder }}"{% endif %}>{% slot value %}{% endslot %}</textarea>
+    {% elif attrs.type == "radio" or attrs.type == "checkbox" %}
+        <input {% if attrs.required %}required{% endif %}
+        {% if attrs.rows %}rows="{{ attrs.rows }}"{% endif %}
+        {% if attrs.type %}type="{{ attrs.type }}"{% endif %}
+        {% if attrs.disabled %}disabled{% endif %}
+        {% if attrs.readonly %}readonly{% endif %}
+        {% if attrs.checked %}checked{% endif %}
+        {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
+        {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
+        {% if attrs.placeholder %}placeholder="{{ attrs.placeholder }}"{% endif %}>{% slot value %}{% endslot %}</input>
+    {% else %}
+        <input {% if attrs.required %}required{% endif %}
+               {% if attrs.disabled %}disabled{% endif %}
+               {% if attrs.readonly %}readonly{% endif %}
+               {% if attrs.checked %}checked{% endif %}
+               {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
+               {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
+               {% if attrs.placeholder %}placeholder="{{ attrs.placeholder }}"{% endif %}
+               {% if attrs.autocomplete %}autocomplete="{{ attrs.autocomplete }}"{% endif %}
+               value="{{ attrs.value|default_if_none:'' }}"
+               type="{{ attrs.type }}"
+               class="p-4 focus:!border-black focus:ring-0 border-2 rounded font-medium placeholder-shown:!border-[#6b7280] border-black valid:border-black invalid:border-red-500">
+    {% endif %}
+    {% if slots.help_text %}
+        <span>
+            {% slot help_text %}
+            {% endslot %}
+        </span>
+    {% endif %}
+</p>

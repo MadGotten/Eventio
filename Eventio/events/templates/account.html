@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}- Account{% endblock %}
+
+{% block base_content %}
+    <div class="flex flex-col w-full flex-grow flex-shrink-0">
+        <h1>Welcome {{ user.username }}</h1>
+        <div class="flex flex-row gap-2">
+            {% if user.has_usable_password %}
+                <a class="btn-link-primary" href="{% url 'account_change_password' %}">Change Password</a>
+            {% else %}
+                <a class="btn-link-primary" href="{% url 'account_set_password' %}">Set Password</a>
+            {% endif %}
+            <a class="btn-link-secondary" href="{% url 'account_email' %}">Change Email</a>
+            <a class="btn-link-secondary hover:!bg-blue-600 !bg-blue-500" href="{% url 'socialaccount_connections' %}">Third Party</a>
+            <a class="btn-link-secondary hover:!bg-red-600 !bg-red-500"
+               href="{% url 'account_delete' %}">Delete Account</a>
+        </div>
+        {% if events %}
+            <h2>Your Events</h2>
+            <div class="flex flex-row gap-3 mb-3"
+                 hx-target="#events"
+                 hx-swap="innerHTML"
+                 _="on htmx:afterOnLoad take [@aria-selected=true] with 'false' from .tab for event.target"
+                 hx-history="false"
+                 hx-replace-url="true">
+                <button class="tab btn-link-primary !bg-green-500 aria-selected:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                        {% if request.GET.status == 'approved' or not request.GET.status %}aria-selected="true"{% endif %}
+                        hx-get="{% url 'account_detail' %}?status=approved">Approved</button>
+                <button class="tab btn-link-primary !bg-blue-500 aria-selected:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                        {% if request.GET.status == 'pending' %}aria-selected="true"{% endif %}
+                        hx-get="{% url 'account_detail' %}?status=pending">Pending</button>
+            </div>
+            <ul id="events"
+                class="flex flex-wrap justify-center sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 w-full sm:w-fit">
+                {% include 'partials/_account_events.html' %}
+            </ul>
+        {% endif %}
+        <h2>Your Bought Tickets</h2>
+        <ul id="purchases"
+            class="flex flex-wrap justify-center sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 w-full sm:w-fit">
+            {% include 'partials/_account_purchases.html' %}
+        </ul>
+        <h2>Your Registered Events</h2>
+        <ul id="registers"
+            class="flex flex-wrap justify-center sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 w-full sm:w-fit">
+            {% include 'partials/_account_registers.html' %}
+        </ul>
+    </div>
+{% endblock %}

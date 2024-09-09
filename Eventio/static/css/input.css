@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+    .btn-primary {
+        @apply py-2 px-5 bg-neoviolet hover:bg-neoviolet-hover text-black font-semibold rounded no-underline border-2 focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:translate-y-0.5 focus:translate-x-0.5 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.9)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)];
+    }
+
+    .btn-link-primary {
+        @apply inline-flex text-base py-2 px-5 bg-neoviolet hover:bg-neoviolet-hover text-black font-semibold rounded no-underline border-2  border-black;
+    }
+
+    .btn-link-secondary {
+        @apply inline-flex text-base py-2 px-5 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold rounded no-underline border-2 border-black;
+    }
+}

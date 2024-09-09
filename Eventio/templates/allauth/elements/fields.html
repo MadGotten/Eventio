@@ -1,0 +1,23 @@
+{% load widget_tweaks %}
+{% for field in attrs.form %}
+    <div class="flex flex-col gap-2 w-full">
+        {% if field.name in attrs.tags %}
+            <div class="flex gap-2">
+                <label for="{{ field.id_for_label }}" class="font-bold">{{ field.label }}</label>
+                {% render_field field class="p-4 w-5 focus:border-black focus:ring-0 focus:ring-offset-0 focus:outline-none border-2 rounded" %}
+            </div>
+        {% else %}
+            <label for="{{ field.id_for_label }}" class="font-bold">{{ field.label }}</label>
+            {% render_field field class="p-4 focus:!border-black focus:ring-0 border-2 rounded font-medium placeholder-shown:!border-[#6b7280] border-black valid:border-black invalid:border-red-500" %}
+        {% endif %}
+        {% if field.errors %}
+        <div class="prose-sm !text-red-500">
+            {{ field.errors }}
+        </div>
+        {% else %}
+            {% if field.help_text %}
+                {{ field.help_text|safe }}
+            {% endif %}
+        {% endif %}
+    </div>
+{% endfor %}

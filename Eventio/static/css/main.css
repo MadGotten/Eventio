@@ -1,0 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+*::selection {
+    background: black;
+    color: white;
+}
+*::-moz-selection {
+    background: black;
+    color: white;
+}
+*::-webkit-selection {
+    background: black;
+    color: white;
+}
+
+label {
+    color: var(--tw-prose-headings)
+}
+
+input[type=checkbox] {
+    color: var(--tw-prose-headings) !important;
+    padding: 0.75rem !important;
+    border-color: var(--tw-prose-headings);
+    &:focus {
+        border-color: var(--tw-prose-headings);
+    }
+}

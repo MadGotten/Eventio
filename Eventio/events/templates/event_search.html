@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}- Search{% endblock %}
+
+{% block base_content %}
+    <div class="flex flex-col gap-6 items-center w-full">
+        <form class="flex flex-nowrap overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,0.9)] bg-black border-black border-2 rounded max-w-96 w-full"
+              hx-get="{% url 'event_search' %}"
+              hx-target="#events"
+              hx-push-url="true"
+              hx-params="q"
+              hx-swap="innerHTML">
+            <input type="text"
+                   name="q"
+                   placeholder="Search for event"
+                   class="py-2 px-3 rounded-s focus:ring-0 border-0 font-medium w-full"
+                   hx-get="{% url 'event_search' %}"
+                   hx-trigger="input changed delay:500ms, q" />
+            <button class="border-l-2 text-text border-black py-2 px-3 bg-black text-white text-base font-semibold"
+                    type="submit">Search</button>
+        </form>
+        <p id="events_count" class="my-1 font-semibold">
+            {% if events %}
+                Results: {{ events.paginator.count }}
+            {% else %}
+                No results
+            {% endif %}
+        </p>
+        <div id="events" class="flex flex-row flex-wrap gap-6 justify-center">{% include 'partials/_event_search.html' %}</div>
+    </div>
+{% endblock %}

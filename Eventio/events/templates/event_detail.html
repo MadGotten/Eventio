@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}- {{ event.title }}{% endblock %}
+
+{% block base_content %}
+    <div class="flex flex-col items-start sm:items-center max-w-lg w-full">
+        {% if event.created_by == user %}
+            <div class="flex flex-col w-fit sm:flex-row sm:w-full gap-2 mb-2">
+                <a class="btn-link-primary" href="{% url 'event_update' event.pk %}">Edit</a>
+                <a class="btn-link-secondary" href="{% url 'event_delete' event.pk %}">Delete</a>
+                {% if user.is_staff or event.created_by == user %}
+                    {% if event.status == 'approved' %}
+                        <div class="inline-flex text-base py-2 px-5 bg-green-500 text-black font-semibold rounded no-underline border-2 border-black">
+                            {{ event.status }}
+                        </div>
+                    {% else %}
+                        <div class="inline-flex text-base py-2 px-5 bg-blue-500 text-black font-semibold rounded no-underline border-2 border-black">
+                            {{ event.status }}
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        {% endif %}
+        {% if event.banner %}
+            <img src="{{ event.banner.url }}"
+                 class="m-0 border-black border-2 rounded"
+                 alt="banner">
+        {% endif %}
+        <div class="flex flex-col gap-2 w-full mt-6 mb-2">
+            <h1 class="mb-3">{{ event.title }}</h1>
+            <p class="m-0">{{ event.description }}</p>
+            <p class="m-0">Location: {{ event.location }}</p>
+            <p class="m-0">Date: {{ event.date | date:"j.n.Y H:i" }}</p>
+            <p class="m-0">Created by: {{ event.created_by }}</p>
+            {% if event.event_type == 'paid' %}
+                <p class="m-0">Remaining tickets: {{ event.ticket.quantity }}</p>
+            {% else %}
+                <p class="m-0">Registered people: {{ event.registrations.count }}</p>
+            {% endif %}
+            <div class="flex flex-col gap-1 mt-1">
+                <small class="m-0">Created: {{ event.created_at | timesince }}</small>
+                <small class="m-0">Last updated: {{ event.updated_at | timesince }}</small>
+            </div>
+        </div>
+        {% if event.event_type == 'free' %}
+            <form method="post"
+                  class="w-full flex justify-center"
+                  action="{% url 'register_event' event.pk %}">
+                {% csrf_token %}
+                <button class="btn-primary" type="submit">
+                    {% if not is_registered %}
+                        Register for this event
+                    {% else %}
+                        Unregister from this event
+                    {% endif %}
+                </button>
+            </form>
+        {% else %}
+            <div class="w-full flex justify-center">
+                <a class="btn-primary hover:!bg-yellow-500 !bg-yellow-400"
+                   href="{% url 'ticket_buy' event.pk %}">Buy ticket for this event</a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
