@@ -13,6 +13,7 @@ class EventAdmin(admin.ModelAdmin):
     list_display = ("title", "created_by", "event_type", "status", "date")
     search_fields = ("title", "description")
     list_filter = ("date", "event_type", "status")
+    readonly_fields = ("created_at", "updated_at")
 
 
 @admin.register(Ticket)
@@ -22,8 +23,9 @@ class TicketAdmin(admin.ModelAdmin):
 
 @admin.register(Registration)
 class RegistrationAdmin(admin.ModelAdmin):
-    list_display = ("user", "event", "registered_at")
+    list_display = ("user", "event")
     search_fields = ("user__username", "event__title")
+    readonly_fields = ("registered_at",)
 
 
 @admin.register(Review)
@@ -34,6 +36,7 @@ class ReviewAdmin(admin.ModelAdmin):
 
 @admin.register(Purchase)
 class PurchaseAdmin(admin.ModelAdmin):
-    list_display = ("ticket", "user", "purchased_at")
+    list_display = ("ticket", "user")
     search_fields = ("user",)
     list_filter = ("purchased_at",)
+    readonly_fields = ("purchased_at",)
