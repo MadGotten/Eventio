@@ -15,8 +15,13 @@
     <p class="mt-3 mb-0 text-base break-words">{{review.comment}}</p>
 </div>
 
-{% if messages and request.htmx %}
-    <section id="messages" hx-swap-oob="true" hx-swap="innerHTML">
-        {% include 'alert.html' %}
-    </section>
+{% if request.htmx %}
+    <div id="review_form" class="bg-green-500 rounded text-center font-semibold p-4 text-black box-shadow border-black border-2" hx-swap-oob="true" hx-swap="innerHTML">
+        Thank you for submitting your Review
+    </div>
+    {% if messages %}
+        <section id="messages" hx-swap-oob="true" hx-swap="innerHTML">
+            {% include 'alert.html' %}
+        </section>
+    {% endif %}
 {% endif %}
