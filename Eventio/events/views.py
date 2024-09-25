@@ -310,17 +310,18 @@ def event_search(request):
 @login_required
 def review_create(request, pk):
     event = get_object_or_404(Event, id=pk)
-
     review_form = ReviewForm(request.POST)
-    if review_form.is_valid:
+
+    if review_form.is_valid():
         review = review_form.save(commit=False)
         review.user = request.user
         review.event = event
         review.save()
         messages.success(request, "Review was submitted.")
-
-    return render(
-        request,
-        "partials/_review.html",
-        {"review": review},
-    )
+        return render(
+            request,
+            "partials/_review.html",
+            {"review": review},
+        )
+    
+    return redirect("event_detail", pk=pk)
