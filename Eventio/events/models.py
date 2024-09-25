@@ -162,6 +162,7 @@ class Review(models.Model):
 
     class Meta:
         unique_together = ["user", "event"]
+        ordering = ["-created_at"]
 
     def __str__(self):
         return f"Review by {self.user.username} for {self.event.title} - {self.rating}"

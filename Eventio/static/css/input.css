@@ -8,10 +8,14 @@
     }
 
     .btn-link-primary {
-        @apply inline-flex text-base py-2 px-5 bg-neoviolet hover:bg-neoviolet-hover text-black font-semibold rounded no-underline border-2  border-black;
+        @apply inline-flex text-base py-2 px-5 bg-neoviolet hover:bg-neoviolet-hover text-black font-semibold rounded no-underline border-2 border-black;
     }
 
     .btn-link-secondary {
         @apply inline-flex text-base py-2 px-5 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold rounded no-underline border-2 border-black;
+    }
+
+    .box-shadow {
+        @apply shadow-[4px_4px_0px_0px_rgba(0,0,0,1)];
     }
 }

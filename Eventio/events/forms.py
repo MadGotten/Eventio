@@ -1,6 +1,6 @@
 from django import forms
 from django.core.validators import MaxValueValidator
-from .models import Event, Ticket
+from .models import Event, Ticket, Review
 from datetime import datetime
 
 
@@ -40,3 +40,12 @@ class BuyTicketForm(forms.Form):
         if ticket:
             self.fields["ticket_quantity"].validators.append(MaxValueValidator(ticket.quantity))
             self.fields["ticket_quantity"].widget.attrs["max"] = ticket.quantity
+
+
+class ReviewForm(forms.ModelForm):
+    rating = forms.IntegerField(widget=forms.HiddenInput())
+    comment = forms.CharField()
+
+    class Meta:
+        model = Review
+        fields = ("rating", "comment")

@@ -1,0 +1,13 @@
+{% for review in reviews %}
+    {% include 'partials/_review.html' %}
+{% endfor %}
+
+{% if reviews.has_next %}
+    <button
+        class="btn-primary hover:!bg-yellow-500 !bg-yellow-400 col-span-full w-fit"
+        hx-get="{% url 'event_detail' event.pk %}?page={{ reviews.next_page_number }}"
+        hx-swap="outerHTML"
+    >
+        Load more
+    </button>
+{% endif %}

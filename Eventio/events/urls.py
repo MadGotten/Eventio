@@ -30,4 +30,5 @@ urlpatterns = [
     path("event/<uuid:pk>/buy_ticket/", views.buy_ticket, name="ticket_buy"),
     path("event/search/", views.event_search, name="event_search"),
     path("accounts/purchase/<int:pk>", views.purchase_detail, name="purchase_detail"),
+    path("event/<uuid:pk>/review", views.review_create, name="review_create"),
 ]

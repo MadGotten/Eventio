@@ -6,11 +6,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.views.decorators.http import require_POST
-from .models import Event, Registration, Ticket, Purchase
+from .models import Event, Registration, Ticket, Purchase, Review
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.db.models import Count
-from .forms import EventForm, TicketForm, BuyTicketForm
+from .forms import EventForm, TicketForm, BuyTicketForm, ReviewForm
 from allauth.account.decorators import reauthentication_required
 
 
@@ -36,8 +36,22 @@ def event_list(request):
 
 def event_detail(request, pk):
     event = get_object_or_404(Event.objects.select_related("created_by"), pk=pk)
-
     user = request.user
+
+    reviews = paginate_queryset(request, event.reviews.all(), per_page=4)
+    has_reviewed = Review.objects.filter(user=user, event=event).exists()
+
+    if event.is_paid:
+        review_allowed = Purchase.objects.filter(user=user, ticket__event=event).exists()
+    else:
+        review_allowed = Registration.objects.filter(user=user, event=event).exists()
+
+    if request.htmx:
+        return render(
+            request,
+            "partials/_reviews.html",
+            {"event": event, "reviews": reviews},
+        )
 
     if event.is_paid and not event.status == "approved" and not event.is_allowed_to_view(user):
         raise Http404()
@@ -48,7 +62,16 @@ def event_detail(request, pk):
         else False
     )
 
-    return render(request, "event_detail.html", {"event": event, "is_registered": is_registered})
+    context = {
+        "event": event,
+        "is_registered": is_registered,
+        "has_reviewed": has_reviewed,
+        "review_form": ReviewForm(),
+        "reviews": reviews,
+        "review_allowed": review_allowed,
+    }
+
+    return render(request, "event_detail.html", context)
 
 
 @login_required
@@ -281,3 +304,23 @@ def event_search(request):
         return render(request, "partials/_event_search.html", {"events": event_obj, "query": query})
 
     return render(request, "event_search.html", {"events": event_obj, "query": query})
+
+
+@require_POST
+@login_required
+def review_create(request, pk):
+    event = get_object_or_404(Event, id=pk)
+
+    review_form = ReviewForm(request.POST)
+    if review_form.is_valid:
+        review = review_form.save(commit=False)
+        review.user = request.user
+        review.event = event
+        review.save()
+        messages.success(request, "Review was submitted.")
+
+    return render(
+        request,
+        "partials/_review.html",
+        {"review": review},
+    )
