@@ -110,10 +110,9 @@ def event_create(request, ticket_form=None):
 
     context = {"form": event_form, "ticket_form": ticket_form}
 
-    return render(request, "event_create.html", context)
+    return render(request, "event_form.html", context)
 
 
-# TODO: add update method to contain ticket for updating
 @login_required
 def event_update(request, pk, ticket_form=None):
     user = request.user
@@ -159,7 +158,7 @@ def event_update(request, pk, ticket_form=None):
 
     context = {"event": event, "form": event_form, "ticket_form": ticket_form}
 
-    return render(request, "event_update.html", context)
+    return render(request, "event_form.html", context)
 
 
 @login_required
