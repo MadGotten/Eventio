@@ -1,9 +1,10 @@
 # Eventio
-Eventio is a web application designed for managing events, allowing users to create, view, and register for events. The platform supports ticket purchasing and user account management.
+Eventio is a web application designed for managing events, allowing users to create, view, and register for events. The platform supports adding a review, ticket purchasing and user account management.
 
 ## Features
 - **User Authentication**: Users can register, log in, and manage their accounts.
 - **Event Management**: Create, update, and delete events with different statuses (approved, pending).
+- **Review System**: Users can submit reviews to events they've been.
 - **Ticketing System**: Users can buy tickets for paid events and register for free events.
 - **Event Search**: Search for events based on title and description.
 - **User Dashboard**: View created events, registered events, and purchased tickets.
@@ -13,6 +14,7 @@ Eventio is a web application designed for managing events, allowing users to cre
 - Django Allauth
 - PostgreSQL
 - HTMX
+- Hyperscript
 - AlpineJS
 - TailwindCSS
 - Pillow
@@ -32,20 +34,28 @@ source venv/bin/activate
 ```bash
 pip install -r development.txt
 ```
-4. Set up the database:
+4. Install Tailwind CLI or add Tailwind CDN for development
+```bash
+npm install -D tailwindcss
+```
+5. Set up the database:
 - Create a PostgreSQL database and user.
 - Update the database settings in core/settings/base.py.
-5. Run migrations:
+6. Run migrations:
 ```bash
 python manage.py migrate
 ```
-6. Create a superuser (optional):
+7. Create a superuser (optional):
 ```bash
 python manage.py createsuperuser
 ```
-7. Run the development server:
+8. Run the development server:
 ```bash
 python manage.py runserver
+```
+9. When using Tailwind CLI start build process (optional):
+```bash
+npx tailwindcss -i Eventio/static/css/input.css -o Eventio/static/css/output.css --watch
 ```
 Open your browser and go to http://127.0.0.1:8000/.
 
