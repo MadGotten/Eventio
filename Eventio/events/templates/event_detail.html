@@ -48,7 +48,7 @@
                   action="{% url 'register_event' event.pk %}">
                 {% csrf_token %}
                 <button class="btn-primary" type="submit">
-                    {% if not is_registered %}
+                    {% if not has_joined %}
                         Register for this event
                     {% else %}
                         Unregister from this event
@@ -65,7 +65,7 @@
             <h3 class="mb-1">Reviews</h3>
 
             {% if not has_reviewed %}
-                {% if review_allowed %}
+                {% if has_joined %}
                     {% include 'partials/_review_form.html' %}
                 {% else %}
                     {% if event.is_paid %}

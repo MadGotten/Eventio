@@ -37,14 +37,7 @@ def event_list(request):
 def event_detail(request, pk):
     event = get_object_or_404(Event.objects.select_related("created_by"), pk=pk)
     user = request.user
-
     reviews = paginate_queryset(request, event.reviews.all(), per_page=4)
-    has_reviewed = Review.objects.filter(user=user, event=event).exists()
-
-    if event.is_paid:
-        review_allowed = Purchase.objects.filter(user=user, ticket__event=event).exists()
-    else:
-        review_allowed = Registration.objects.filter(user=user, event=event).exists()
 
     if request.htmx:
         return render(
@@ -56,19 +49,23 @@ def event_detail(request, pk):
     if event.is_paid and not event.status == "approved" and not event.is_allowed_to_view(user):
         raise Http404()
 
-    is_registered = (
-        Registration.objects.filter(event=event, user=user).exists()
-        if user.is_authenticated
-        else False
-    )
+    has_reviewed = False
+    has_joined = False
+
+    if user.is_authenticated:
+        has_reviewed = Review.objects.filter(user=user, event=event).exists()
+
+        if event.is_paid:
+            has_joined = Purchase.objects.filter(user=user, ticket__event=event).exists()
+        else:
+            has_joined = Registration.objects.filter(event=event, user=user).exists()
 
     context = {
         "event": event,
-        "is_registered": is_registered,
+        "has_joined": has_joined,
         "has_reviewed": has_reviewed,
         "review_form": ReviewForm(),
         "reviews": reviews,
-        "review_allowed": review_allowed,
     }
 
     return render(request, "event_detail.html", context)
@@ -322,5 +319,5 @@ def review_create(request, pk):
             "partials/_review.html",
             {"review": review},
         )
-    
+
     return redirect("event_detail", pk=pk)
