@@ -5,8 +5,8 @@ import os
 
 SECRET_KEY = os.environ.get("SECRET")
 
-ALLOWED_HOSTS = ["eventio.madgotten.pl", "eventio-mcw0.onrender.com"]
-CSRF_TRUSTED_ORIGINS = ["https://eventio.madgotten.pl", "https://eventio-mcw0.onrender.com"]
+ALLOWED_HOSTS = ["eventio.madgotten.me", "eventio-mcw0.onrender.com"]
+CSRF_TRUSTED_ORIGINS = ["https://eventio.madgotten.me", "https://eventio-mcw0.onrender.com"]
 
 SECURE_HSTS_SECONDS = 60
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
