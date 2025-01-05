@@ -9,7 +9,6 @@ from django.views.decorators.http import require_POST
 from .models import Event, Registration, Ticket, Purchase, Review
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
-from django.db.models import Count
 from .forms import EventForm, TicketForm, BuyTicketForm, ReviewForm
 from allauth.account.decorators import reauthentication_required
 
@@ -21,9 +20,9 @@ def paginate_queryset(request, queryset, page_param="page", per_page=4):
 
 
 def event_list(request):
-    events = Event.objects.filter(status="approved").select_related("ticket")
-    popular = events.annotate(num_registers=Count("registrations")).order_by("-num_registers")[:4]
-    recent_list = events.exclude(id__in=popular.values_list("id", flat=True))
+    events = Event.objects.active().select_related("ticket")
+    popular = events.popular()[:4]
+    recent_list = events.recent_without_duplicates(popular)
 
     recent = paginate_queryset(request, recent_list)
 
@@ -46,27 +45,25 @@ def event_detail(request, pk):
             {"event": event, "reviews": reviews},
         )
 
-    if event.is_paid and not event.status == "approved" and not event.is_allowed_to_view(user):
+    if event.is_paid and not event.is_active and not event.is_allowed_to_view(user):
         raise Http404()
 
-    has_reviewed = False
-    has_joined = False
-
-    if user.is_authenticated:
-        has_reviewed = Review.objects.filter(user=user, event=event).exists()
-
-        if event.is_paid:
-            has_joined = Purchase.objects.filter(user=user, ticket__event=event).exists()
-        else:
-            has_joined = Registration.objects.filter(event=event, user=user).exists()
 
     context = {
         "event": event,
-        "has_joined": has_joined,
-        "has_reviewed": has_reviewed,
+        "has_joined": False,
+        "has_reviewed": False,
         "review_form": ReviewForm(),
         "reviews": reviews,
     }
+
+    if user.is_authenticated:
+        context["has_reviewed"] = Review.objects.filter(user=user, event=event).exists()
+
+        if event.is_paid:
+            context["has_joined"] = Purchase.objects.filter(user=user, ticket__event=event).exists()
+        else:
+            context["has_joined"] = Registration.objects.filter(event=event, user=user).exists()
 
     return render(request, "event_detail.html", context)
 
