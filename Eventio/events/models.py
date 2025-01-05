@@ -1,15 +1,13 @@
-from io import BytesIO
 import logging
 import uuid
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, IntegrityError, transaction
 from django.contrib.auth.models import User
 from django.db.models import F
-from PIL import Image, ImageOps
-from django.core.files.base import ContentFile
 from django.urls import reverse
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from .helpers import validate_image
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
@@ -31,8 +29,12 @@ class Event(models.Model):
     date = models.DateTimeField()
     category = models.CharField(max_length=100)
     banner = models.ImageField(upload_to="banners/", null=True, blank=True)
-    event_type = models.CharField(max_length=4, choices=EVENT_TYPE_CHOICES, default="free")
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="events")
+    event_type = models.CharField(
+        max_length=4, choices=EVENT_TYPE_CHOICES, default="free"
+    )
+    created_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="events"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
@@ -68,21 +70,10 @@ class Event(models.Model):
                 pass
 
             try:
-                img = Image.open(self.banner)
-                img.verify()
-                img = Image.open(self.banner)
-
-                if img.mode in ("RGBA", "LA", "P"):
-                    img = img.convert("RGB")
-
-                img = ImageOps.contain(img, (500, 300))
-                temp_img = BytesIO()
-                img.save(temp_img, format="WEBP", optimize=True, quality=95)
-                temp_img.seek(0)
-
+                content_file = validate_image(self.banner)
                 new_filename = f"{uuid.uuid4()}.webp"
 
-                self.banner.save(new_filename, ContentFile(temp_img.read()), save=False)
+                self.banner.save(new_filename, content_file, save=False)
 
                 if old_banner:
                     old_banner.delete(save=False)
@@ -101,8 +92,12 @@ def delete_cascade_event_img(sender, instance, **kwargs):
 
 
 class Registration(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="registartions")
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="registrations")
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="registartions"
+    )
+    event = models.ForeignKey(
+        Event, on_delete=models.CASCADE, related_name="registrations"
+    )
     registered_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -115,7 +110,9 @@ class Registration(models.Model):
 class Ticket(models.Model):
     event = models.OneToOneField(Event, on_delete=models.CASCADE, related_name="ticket")
     price = models.DecimalField(
-        max_digits=10, decimal_places=2, validators=[MinValueValidator(1), MaxValueValidator(1000)]
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(1), MaxValueValidator(1000)],
     )
     quantity = models.PositiveIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(100000)]
@@ -156,7 +153,9 @@ class Purchase(models.Model):
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="reviews")
-    rating = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    rating = models.PositiveIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
     comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

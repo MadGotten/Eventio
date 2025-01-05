@@ -35,8 +35,8 @@ def event_list(request):
 
 
 def event_detail(request, pk):
-    event = get_object_or_404(Event.objects.select_related("created_by"), pk=pk)
     user = request.user
+    event = get_object_or_404(Event.objects.select_related("created_by"), pk=pk)
     reviews = paginate_queryset(request, event.reviews.all(), per_page=4)
 
     if request.htmx:
