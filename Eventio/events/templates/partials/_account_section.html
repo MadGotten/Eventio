@@ -1,0 +1,6 @@
+{% if section_title %}
+    <h2>{{ section_title }}</h2>
+{% endif %}
+<ul id="{{ section_id }}" class="flex flex-wrap justify-center sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 w-full sm:w-fit">
+    {% include template_name %}
+</ul>

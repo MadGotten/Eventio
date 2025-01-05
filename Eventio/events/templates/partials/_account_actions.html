@@ -1,0 +1,10 @@
+<div class="flex flex-row gap-2">
+    {% with change_password_url=user.has_usable_password|yesno:"account_change_password,account_set_password" %}
+        <a class="btn-link-primary" href="{% url change_password_url %}">
+            {{ user.has_usable_password|yesno:"Change,Set" }} Password
+        </a>
+    {% endwith %}
+    <a class="btn-link-secondary" href="{% url 'account_email' %}">Change Email</a>
+    <a class="btn-link-secondary hover:!bg-blue-600 !bg-blue-500" href="{% url 'socialaccount_connections' %}">Third Party</a>
+    <a class="btn-link-secondary hover:!bg-red-600 !bg-red-500" href="{% url 'account_delete' %}">Delete Account</a>
+</div>
