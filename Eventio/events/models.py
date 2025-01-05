@@ -12,6 +12,25 @@ from .helpers import validate_image
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
 
+class EventQueryset(models.QuerySet):
+    def active(self):
+        return self.filter(status="approved")
+
+    def free(self):
+        return self.filter(event_type="free")
+
+    def paid(self):
+        return self.filter(event_type="paid")
+
+    def popular(self):
+        return self.annotate(num_registers=models.Count("registrations")).order_by(
+            "-num_registers"
+        )
+
+    def recent_without_duplicates(self, popular):
+        return self.exclude(id__in=popular.values_list("id", flat=True))
+
+
 class Event(models.Model):
     EVENT_TYPE_CHOICES = [
         ("free", "Free"),
@@ -39,6 +58,8 @@ class Event(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
 
+    objects = EventQueryset.as_manager()
+
     class Meta:
         ordering = ["-created_at"]
 
@@ -52,6 +73,10 @@ class Event(models.Model):
     @property
     def is_paid(self):
         return self.event_type == "paid"
+
+    @property
+    def is_active(self):
+        return self.status == "approved"
 
     def is_allowed_to_view(self, user):
         return user.is_staff or self.created_by == user
