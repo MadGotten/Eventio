@@ -1,5 +1,5 @@
 {% for review in reviews %}
-    {% include 'partials/_review.html' %}
+    {% include 'partials/_review.html' with hideMessages=True %}
 {% endfor %}
 
 {% if reviews.has_next %}
