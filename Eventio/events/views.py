@@ -6,10 +6,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.views.decorators.http import require_POST
-from .models import Event, Registration, Ticket, Purchase, Review
+from events.models import Event, Registration, Ticket, Purchase, Review
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
-from .forms import EventForm, TicketForm, BuyTicketForm, ReviewForm
+from events.forms import EventForm, TicketForm, BuyTicketForm, ReviewForm
 from allauth.account.decorators import reauthentication_required
 
 
@@ -82,23 +82,23 @@ def event_create(request, ticket_form=None):
         event_form = EventForm(request.POST, request.FILES)
         ticket_form = TicketForm(request.POST)
 
-        if event_form.is_valid() and (
-            event_form.cleaned_data["event_type"] == "free" or ticket_form.is_valid()
-        ):
+        if event_form.is_valid():
             event = event_form.save(commit=False)
             event.created_by = request.user
             if event.is_free:
                 event.status = "approved"
                 event.save()
-            else:
+                messages.success(request, "Event was created successfully.")
+                return redirect("event_detail", pk=event.pk)
+            
+            if ticket_form.is_valid():
+                ticket = ticket_form.save(commit=False)
                 event.status = "pending"
                 event.save()
-                ticket = ticket_form.save(commit=False)
                 ticket.event = event
                 ticket.save()
-
-            messages.success(request, "Event was created successfully.")
-            return redirect("event_detail", pk=event.pk)
+                messages.success(request, "Event was created successfully.")
+                return redirect("event_detail", pk=event.pk)
     else:
         event_form = EventForm()
 

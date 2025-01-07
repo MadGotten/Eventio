@@ -1,13 +1,11 @@
 import logging
 import uuid
-from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db import models, IntegrityError, transaction
+from django.db import models
 from django.contrib.auth.models import User
-from django.db.models import F
 from django.urls import reverse
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
-from .helpers import validate_image
+from events.helpers import validate_image
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
@@ -114,79 +112,3 @@ def delete_cascade_event_img(sender, instance, **kwargs):
     """Cleanup associated image in bucket after event deletion"""
     if instance.banner:
         instance.banner.delete(save=False)
-
-
-class Registration(models.Model):
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="registartions"
-    )
-    event = models.ForeignKey(
-        Event, on_delete=models.CASCADE, related_name="registrations"
-    )
-    registered_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ["user", "event"]
-
-    def __str__(self):
-        return f"{self.user.username} registered for {self.event.title}"
-
-
-class Ticket(models.Model):
-    event = models.OneToOneField(Event, on_delete=models.CASCADE, related_name="ticket")
-    price = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        validators=[MinValueValidator(1), MaxValueValidator(1000)],
-    )
-    quantity = models.PositiveIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(100000)]
-    )
-
-    @staticmethod
-    @transaction.atomic
-    def buy(user, event, quantity):
-        ticket = Ticket.objects.select_for_update().get(event=event)
-
-        if ticket.quantity <= 0 or ticket.quantity < quantity:
-            raise IntegrityError("Ticket quantity insufficient")
-
-        ticket.quantity = F("quantity") - quantity
-        ticket.save()
-
-        purchase = Purchase.objects.create(ticket=ticket, user=user, quantity=quantity)
-        return purchase
-
-    def __str__(self):
-        return f"Ticket for {self.event.title} price {self.price}"
-
-
-class Purchase(models.Model):
-    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="purchases")
-    quantity = models.PositiveIntegerField(default=1)
-    purchased_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.user.username} bought ticket for {self.ticket.event.title}"
-
-    @property
-    def total(self):
-        return self.quantity * self.ticket.price
-
-
-class Review(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="reviews")
-    rating = models.PositiveIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(5)]
-    )
-    comment = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ["user", "event"]
-        ordering = ["-created_at"]
-
-    def __str__(self):
-        return f"Review by {self.user.username} for {self.event.title} - {self.rating}"

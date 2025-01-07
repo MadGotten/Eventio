@@ -1,6 +1,6 @@
 from django.contrib import admin
 from allauth.account.decorators import secure_admin_login
-from .models import Event, Ticket, Registration, Review, Purchase
+from events.models import Event, Ticket, Registration, Review, Purchase
 
 
 admin.autodiscover()

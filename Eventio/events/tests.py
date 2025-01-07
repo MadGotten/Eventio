@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core.files.uploadedfile import SimpleUploadedFile
-from .models import Event, Registration
+from events.models import Event, Registration
 from django.db.utils import IntegrityError
 from django.db import transaction
 import uuid

@@ -1,6 +1,6 @@
 from django import forms
 from django.core.validators import MaxValueValidator
-from .models import Event, Ticket, Review
+from events.models import Event, Ticket, Review
 from datetime import datetime
 
 
