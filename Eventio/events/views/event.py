@@ -227,7 +227,8 @@ def event_search(request):
         events = Event.objects.active().filter(title__icontains=query).select_related("ticket")
         event_obj = paginate_queryset(request, events)
     else:
-        event_obj = None
+        events = Event.objects.all().select_related("ticket")
+        event_obj = paginate_queryset(request, events)
 
     if request.htmx:
         return render(
