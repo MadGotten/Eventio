@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -10,6 +10,7 @@ from PIL import Image
 import io
 
 
+@override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
 class EventModelTest(TestCase):
     def setUp(self):
         self.user = User.objects.create(username="testuser")
