@@ -3,14 +3,12 @@ from django.http import Http404, HttpResponse
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import logout
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from events.models import Event, Registration, Ticket, Purchase, Review
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from events.forms import EventForm, TicketForm, BuyTicketForm, ReviewForm
-from allauth.account.decorators import reauthentication_required
 
 
 def paginate_queryset(request, queryset, page_param="page", per_page=4):
@@ -47,7 +45,6 @@ def event_detail(request, pk):
 
     if event.is_paid and not event.is_active and not event.is_allowed_to_view(user):
         raise Http404()
-
 
     context = {
         "event": event,
@@ -90,7 +87,7 @@ def event_create(request, ticket_form=None):
                 event.save()
                 messages.success(request, "Event was created successfully.")
                 return redirect("event_detail", pk=event.pk)
-            
+
             if ticket_form.is_valid():
                 ticket = ticket_form.save(commit=False)
                 event.status = "pending"
@@ -206,7 +203,8 @@ def buy_ticket(request, pk):
             except IntegrityError as e:
                 logging.error(f"Ticket purchase failed: {e}")
                 messages.error(
-                    request, "Ticket purchase failed due to insufficient quantity or other issues."
+                    request,
+                    "Ticket purchase failed due to insufficient quantity or other issues.",
                 )
 
     return render(request, "ticket_buy.html", {"event": event, "form": form})
@@ -215,106 +213,27 @@ def buy_ticket(request, pk):
 @login_required
 def purchase_detail(request, pk):
     purchase = get_object_or_404(
-        Purchase.objects.select_related("ticket__event", "user"), pk=pk, user=request.user
+        Purchase.objects.select_related("ticket__event", "user"),
+        pk=pk,
+        user=request.user,
     )
 
     return render(request, "purchase_detail.html", {"purchase": purchase})
 
 
-@login_required
-def account_detail(request):
-    user = request.user
-
-    status = request.GET.get("status", "approved")
-    purchase_page = request.GET.get("purchases")
-    register_page = request.GET.get("registers")
-
-    purchases = paginate_queryset(
-        request,
-        user.purchases.all().order_by("-purchased_at").select_related("user", "ticket__event"),
-        page_param="purchases",
-        per_page=5,
-    )
-    registers = paginate_queryset(
-        request,
-        user.registartions.all().order_by("-registered_at").select_related("event", "user"),
-        page_param="registers",
-        per_page=5,
-    )
-
-    if status in ["pending", "approved"]:
-        events = paginate_queryset(
-            request,
-            user.events.filter(status=status).select_related("ticket"),
-            page_param="events",
-            per_page=5,
-        )
-    else:
-        events = None
-
-    if request.htmx:
-        if purchase_page:
-            return render(request, "partials/_account_purchases.html", {"purchases": purchases})
-        elif register_page:
-            return render(request, "partials/_account_registers.html", {"registers": registers})
-        elif status:
-            return render(
-                request,
-                "partials/_account_events.html",
-                {"events": events},
-            )
-        return Http404()
-
-    return render(
-        request, "account.html", {"events": events, "registers": registers, "purchases": purchases}
-    )
-
-
-@login_required
-@reauthentication_required
-def account_delete(request):
-    if request.POST:
-        user = request.user
-        logout(request)
-        user.delete()
-        messages.success(request, "Account successfully deleted")
-        return redirect("event_list")
-
-    return render(request, "account_delete.html")
-
-
 def event_search(request):
     query = request.GET.get("q")
     if query:
-        events = Event.objects.filter(status="approved", title__icontains=query).select_related(
-            "ticket"
-        )
+        events = Event.objectsactive().filter(title__icontains=query).select_related("ticket")
         event_obj = paginate_queryset(request, events)
     else:
         event_obj = None
 
     if request.htmx:
-        return render(request, "partials/_event_search.html", {"events": event_obj, "query": query})
-
-    return render(request, "event_search.html", {"events": event_obj, "query": query})
-
-
-@require_POST
-@login_required
-def review_create(request, pk):
-    event = get_object_or_404(Event, id=pk)
-    review_form = ReviewForm(request.POST)
-
-    if review_form.is_valid():
-        review = review_form.save(commit=False)
-        review.user = request.user
-        review.event = event
-        review.save()
-        messages.success(request, "Review was submitted.")
         return render(
             request,
-            "partials/_review.html",
-            {"review": review},
+            "partials/_event_search.html",
+            {"events": event_obj, "query": query},
         )
 
-    return redirect("event_detail", pk=pk)
+    return render(request, "event_search.html", {"events": event_obj, "query": query})
