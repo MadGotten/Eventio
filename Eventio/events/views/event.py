@@ -224,7 +224,7 @@ def purchase_detail(request, pk):
 def event_search(request):
     query = request.GET.get("q")
     if query:
-        events = Event.objectsactive().filter(title__icontains=query).select_related("ticket")
+        events = Event.objects.active().filter(title__icontains=query).select_related("ticket")
         event_obj = paginate_queryset(request, events)
     else:
         event_obj = None
