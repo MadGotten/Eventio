@@ -20,10 +20,9 @@ def paginate_queryset(request, queryset, page_param="page", per_page=4):
 def event_list(request):
     events = Event.objects.active().select_related("ticket")
     popular = events.popular()[:4]
-    recent_list = events.recent_without_duplicates(popular)
+    recent_list = events.recent().exclude(id__in=popular.values_list("id", flat=True))
 
     recent = paginate_queryset(request, recent_list)
-
     if request.htmx:
         return render(request, "partials/_recent_events.html", {"recent": recent})
 

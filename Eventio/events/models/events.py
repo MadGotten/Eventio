@@ -3,8 +3,6 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
-from django.db.models.signals import post_delete
-from django.dispatch import receiver
 from events.helpers import validate_image
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -21,12 +19,10 @@ class EventQueryset(models.QuerySet):
         return self.filter(event_type="paid")
 
     def popular(self):
-        return self.annotate(num_registers=models.Count("registrations")).order_by(
-            "-num_registers"
-        )
+        return self.annotate(num_registers=models.Count("registrations")).order_by("-num_registers")
 
-    def recent_without_duplicates(self, popular):
-        return self.exclude(id__in=popular.values_list("id", flat=True))
+    def recent(self):
+        return self.order_by("-created_at")
 
 
 class Event(models.Model):
@@ -46,12 +42,8 @@ class Event(models.Model):
     date = models.DateTimeField()
     category = models.CharField(max_length=100)
     banner = models.ImageField(upload_to="banners/", null=True, blank=True)
-    event_type = models.CharField(
-        max_length=4, choices=EVENT_TYPE_CHOICES, default="free"
-    )
-    created_by = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="events"
-    )
+    event_type = models.CharField(max_length=4, choices=EVENT_TYPE_CHOICES, default="free")
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="events")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
@@ -105,10 +97,3 @@ class Event(models.Model):
                 raise ValueError(f"The uploaded file is not a valid image: {e}")
 
         super().save(*args, **kwargs)
-
-
-@receiver(post_delete, sender=Event)
-def delete_cascade_event_img(sender, instance, **kwargs):
-    """Cleanup associated image in bucket after event deletion"""
-    if instance.banner:
-        instance.banner.delete(save=False)
