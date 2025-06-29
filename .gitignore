@@ -8,3 +8,7 @@ __pycache__
 db.sqlite3
 media
 database
+
+# IDE settings
+.idea
+.vscode
