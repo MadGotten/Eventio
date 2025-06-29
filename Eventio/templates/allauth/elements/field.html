@@ -34,7 +34,7 @@
                {% if attrs.autocomplete %}autocomplete="{{ attrs.autocomplete }}"{% endif %}
                value="{{ attrs.value|default_if_none:'' }}"
                type="{{ attrs.type }}"
-               class="p-4 focus:!border-black focus:ring-0 border-2 rounded font-medium placeholder-shown:!border-[#6b7280] border-black valid:border-black invalid:border-red-500">
+               class="p-3 focus:!border-black focus:ring-0 border-2 rounded font-medium placeholder-shown:!border-[#6b7280] border-black valid:border-black invalid:border-red-500">
     {% endif %}
     {% if slots.help_text %}
         <span>
