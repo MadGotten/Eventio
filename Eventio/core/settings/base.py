@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -109,7 +110,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-DEFAULT_FROM_EMAIL = "eventio@madgotten.pl"
+DEFAULT_FROM_EMAIL = "eventio@madgotten.me"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -139,3 +140,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.Argon2PasswordHasher",
 ]
+
+STRIPE_API_PUBLIC = os.environ.get("STRIPE_API_PUBLIC")
+STRIPE_API_SECRET = os.environ.get("STRIPE_API_SECRET")
+
+STATIC_HOST = os.environ.get("STATIC_HOST")

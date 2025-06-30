@@ -8,7 +8,7 @@ SECRET_KEY = os.environ.get("SECRET")
 ALLOWED_HOSTS = ["eventio.madgotten.me", "eventio-mcw0.onrender.com"]
 CSRF_TRUSTED_ORIGINS = ["https://eventio.madgotten.me", "https://eventio-mcw0.onrender.com"]
 
-SECURE_HSTS_SECONDS = 60
+SECURE_HSTS_SECONDS = 3600
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
@@ -17,8 +17,12 @@ SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+X_FRAME_OPTIONS = "DENY"
+
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-SECURE_SSL_REDIRECT = True
 
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
@@ -59,5 +63,3 @@ CLOUDINARY_STORAGE = {
     "API_SECRET": os.environ.get("CLOUD_API_SECRET"),
     "SECURE": True,
 }
-
-STATIC_HOST = os.environ.get("STATIC_HOST")
