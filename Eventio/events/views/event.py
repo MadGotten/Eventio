@@ -1,14 +1,17 @@
 import logging
+from django.conf import settings
 from django.http import Http404, HttpResponse
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.urls import reverse
 from django.views.decorators.http import require_POST
+import stripe
 from events.models import Event, Registration, Ticket, Purchase, Review
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import IntegrityError
 from events.forms import EventForm, TicketForm, BuyTicketForm, ReviewForm
+from events import payment
 
 
 def paginate_queryset(request, queryset, page_param="page", per_page=4):
@@ -178,35 +181,70 @@ def register_for_event(request, pk):
 
 @login_required
 def buy_ticket(request, pk):
-    user = request.user
     event = get_object_or_404(Event.objects.select_related("ticket"), pk=pk)
     form = BuyTicketForm(request.POST, ticket=event.ticket)
 
     if request.method == "POST":
         if form.is_valid():
             quantity = form.cleaned_data["ticket_quantity"]
-            total_price = event.ticket.price * quantity
+
+            success_url = request.build_absolute_uri(
+                reverse("ticket_payment_success", kwargs={"pk": event.pk})
+            )
+
+            cancel_url = request.build_absolute_uri(reverse("ticket_buy", kwargs={"pk": event.pk}))
 
             try:
-                purchase = Ticket.buy(user, event, quantity)
-                messages.success(
-                    request,
-                    f"Purchased {quantity} tickets for {event.title} at ${total_price:.2f}.",
-                )
-                logging.info(
-                    "Purchase successful: user "
-                    f"{request.user} bought {quantity} tickets for {event} "
-                    f"at ${total_price:.2f}."
-                )
-                return redirect("purchase_detail", pk=purchase.pk)
-            except IntegrityError as e:
-                logging.error(f"Ticket purchase failed: {e}")
-                messages.error(
-                    request,
-                    "Ticket purchase failed due to insufficient quantity or other issues.",
+                checkout_url = payment.start_checkout_session(
+                    success_url=success_url,
+                    cancel_url=cancel_url,
+                    price=event.ticket.price_to_cents,
+                    quantity=quantity,
+                    product_data={
+                        "name": f"{event.title} - Ticket",
+                        "description": event.description,
+                        "images": [event.get_banner_url()],
+                    },
                 )
 
-    return render(request, "ticket_buy.html", {"event": event, "form": form})
+                return redirect(checkout_url)
+            except stripe.error.StripeError as e:
+                logging.error(f"Stripe error: {e}")
+                messages.error(
+                    request,
+                    "There was an error processing your payment. Please try again.",
+                )
+
+    return render(
+        request,
+        "ticket_buy.html",
+        {"event": event, "form": form, "stripe_public_key": settings.STRIPE_API_PUBLIC},
+    )
+
+
+@login_required
+def payment_success(request, pk):
+    session_id = request.GET.get("session_id")
+
+    checkout_session = payment.get_checkout_session(session_id)
+
+    quantity = int(checkout_session.metadata.get("quantity", 1))
+
+    try:
+        event = Event.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        messages.error(request, "Event not found.")
+        return redirect("event_list")
+
+    purchase = Ticket.buy(request.user, event, quantity)
+    messages.success(
+        request,
+        f"Purchased {quantity} tickets for {event.title}.",
+    )
+    logging.info(
+        "Purchase successful: user " f"{request.user} bought {quantity} tickets for {event} "
+    )
+    return redirect("purchase_detail", pk=purchase.pk)
 
 
 @login_required
@@ -214,7 +252,7 @@ def purchase_detail(request, pk):
     purchase = get_object_or_404(
         Purchase.objects.select_related("ticket__event", "user"),
         pk=pk,
-        user=request.user,
+        user_id=request.user.id,
     )
 
     return render(request, "purchase_detail.html", {"purchase": purchase})

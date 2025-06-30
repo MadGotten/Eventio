@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from events.helpers import validate_image
+from django.conf import settings
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
@@ -68,6 +69,9 @@ class Event(models.Model):
     def is_active(self):
         return self.status == "approved"
 
+    def get_banner_url(self):
+        return settings.STATIC_HOST + self.banner.url if self.banner else None
+
     def is_allowed_to_view(self, user):
         return user.is_staff or self.created_by == user
 
@@ -96,4 +100,4 @@ class Event(models.Model):
             except (IOError, SyntaxError) as e:
                 raise ValueError(f"The uploaded file is not a valid image: {e}")
 
-        super().save(*args, **kwargs)
+        return super().save(*args, **kwargs)

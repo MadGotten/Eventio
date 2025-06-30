@@ -8,9 +8,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 
 
 class Ticket(models.Model):
-    event = models.OneToOneField(
-        "Event", on_delete=models.CASCADE, related_name="ticket"
-    )
+    event = models.OneToOneField("Event", on_delete=models.CASCADE, related_name="ticket")
     price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -19,6 +17,10 @@ class Ticket(models.Model):
     quantity = models.PositiveIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(100000)]
     )
+
+    @property
+    def price_to_cents(self):
+        return int(self.price * 100)
 
     @staticmethod
     @transaction.atomic
