@@ -2,10 +2,10 @@
 
 {% for event in events %}
     <a href="{% url 'event_detail' event.pk %}"
-       class="flex flex-col gap-1 border-black border-2 no-underline w-56 sm:w-64 lg:w-72 rounded shadow-dark hover:-translate-y-1 transition-transform">
+       class="flex flex-col gap-1 {% if section == "popular" %} bg-neoviolet {% elif section == "events" %} bg-yellow-400 {% endif %} border-black border-2 no-underline w-56 sm:w-64 lg:w-72 rounded shadow-dark hover:-translate-y-1 transition-transform">
         <img {% if event.banner %}src="{{ event.banner.url }}"{% else %}src="{% static 'images/default.jpg' %}"{% endif %}
              alt="event banner"
-             class="m-0 w-full h-48 sm:h-56 lg:h-64 bg-gray-200 object-fill" />
+             class="m-0 w-full h-48 sm:h-56 lg:h-64 bg-gray-200 object-cover" />
         <div class="px-4 py-2">
             <div class="flex flex-row justify-between text-lg font-semibold text-nowrap gap-2">
                 <span class="text-ellipsis overflow-hidden">{{ event.title }}</span>

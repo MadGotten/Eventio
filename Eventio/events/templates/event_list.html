@@ -24,45 +24,13 @@
         {% if popular %}
             <h2 class="text-2xl sm:text-3xl">Popular Events</h2>
             <div class="flex flex-row flex-wrap gap-4 lg:gap-6 justify-center">
-                {% for event in popular %}
-                    <a href="{% url 'event_detail' event.pk %}"
-                       class="flex flex-col gap-1 bg-neoviolet border-black border-2 no-underline w-56 sm:w-64 lg:w-72 rounded shadow-dark hover:-translate-y-1 transition-transform">
-                        <img {% if event.banner %}src="{{ event.banner.url }}"{% else %}src="{% static 'images/default.jpg' %}"{% endif %}
-                             alt="event banner"
-                             class="m-0 w-full h-48 sm:h-56 lg:h-64 bg-gray-200 object-fill" />
-                        <div class="px-4 py-2">
-                            <div class="flex flex-row justify-between text-lg font-semibold text-nowrap gap-2">
-                                <span class="text-ellipsis overflow-hidden">{{ event.title }}</span>
-                                {% if event.is_paid %}<span>{{ event.ticket.price }}$</span>{% endif %}
-                            </div>
-                            <p class="m-0 mt-1 text-base text-gray-800 text-ellipsis overflow-hidden text-nowrap">
-                                {{ event.date|date:"d.m.Y H:i" }}
-                            </p>
-                        </div>
-                    </a>
-                {% endfor %}
+                {% include 'partials/_events.html' with events=popular section="popular" only %}
             </div>
         {% endif %}
         {% if events %}
             <h2 class="text-2xl sm:text-3xl">New favourites</h2>
             <div class="flex flex-row flex-wrap gap-6 justify-center">
-                {% for event in events|slice:":4" %}
-                    <a href="{% url 'event_detail' event.pk %}"
-                       class="flex flex-col gap-1 bg-yellow-400 border-black border-2 no-underline w-56 sm:w-64 lg:w-72 rounded shadow-dark hover:-translate-y-1 transition-transform">
-                        <img {% if event.banner %}src="{{ event.banner.url }}"{% else %}src="{% static 'images/default.jpg' %}"{% endif %}
-                             alt="event banner"
-                             class="m-0 w-full h-48 sm:h-56 lg:h-64 bg-gray-200 object-fill" />
-                        <div class="px-4 py-2">
-                            <div class="flex flex-row justify-between text-lg font-semibold text-nowrap gap-2">
-                                <span class="text-ellipsis overflow-hidden">{{ event.title }}</span>
-                                {% if event.is_paid %}<span>{{ event.ticket.price }}$</span>{% endif %}
-                            </div>
-                            <p class="m-0 mt-1 text-base text-gray-800 text-ellipsis overflow-hidden text-nowrap">
-                                {{ event.date|date:"d.m.Y H:i" }}
-                            </p>
-                        </div>
-                    </a>
-                {% endfor %}
+                {% include 'partials/_events.html' with events=events section="events" only %}
             </div>
         {% endif %}
         {% if recent %}

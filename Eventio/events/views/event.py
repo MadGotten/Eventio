@@ -29,7 +29,7 @@ def event_list(request):
     if request.htmx:
         return render(request, "partials/_recent_events.html", {"recent": recent})
 
-    context = {"events": events, "popular": popular, "recent": recent}
+    context = {"events": events[:4], "popular": popular, "recent": recent}
     return render(request, "event_list.html", context)
 
 
