@@ -9,7 +9,7 @@ Eventio is a web application designed for managing events, allowing users to cre
 - **Event Search**: Search for events based on title and description.
 - **User Dashboard**: View created events, registered events, and purchased tickets.
 
-## Technologies
+## Tech Stack
 - Django
 - Django Allauth
 - PostgreSQL
@@ -18,6 +18,7 @@ Eventio is a web application designed for managing events, allowing users to cre
 - AlpineJS
 - TailwindCSS
 - Pillow
+- Stripe
 
 ## Installation
 1. Clone the repository:
@@ -53,7 +54,7 @@ python manage.py createsuperuser
 ```bash
 python manage.py runserver
 ```
-9. When using Tailwind CLI start build process (optional):
+9. When using Tailwind CLI start build process:
 ```bash
 npx tailwindcss -i Eventio/static/css/input.css -o Eventio/static/css/output.css --watch
 ```
