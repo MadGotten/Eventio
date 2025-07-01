@@ -1,3 +1,5 @@
+[![Eventio CI](https://github.com/MadGotten/Eventio/actions/workflows/django.yml/badge.svg)](https://github.com/MadGotten/Eventio/actions/workflows/django.yml)
+
 # Eventio
 Eventio is a web application designed for managing events, allowing users to create, view, and register for events. The platform supports adding a review, ticket purchasing and user account management.
 
