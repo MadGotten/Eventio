@@ -13,6 +13,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from events.forms import EventForm, TicketForm, BuyTicketForm, ReviewForm
 from events import payment
 
+logger = logging.getLogger(__name__)
+
 
 def paginate_queryset(request, queryset, page_param="page", per_page=4):
     paginator = Paginator(queryset, per_page)
@@ -45,8 +47,12 @@ def event_detail(request, pk):
             {"event": event, "reviews": reviews},
         )
 
-    if event.is_paid and not event.is_active and not event.is_allowed_to_view(user):
-        raise Http404()
+    if event.is_paid and not event.is_active:
+        if user.is_anonymous or not event.is_allowed_to_view(user):
+            logger.warning(
+                f"User {user.id if user.is_authenticated else "anonymous"} tried to view event {event.id} that is paid and not active"
+            )
+            raise Http404()
 
     context = {
         "event": event,
@@ -129,6 +135,7 @@ def event_update(request, pk, ticket_form=None):
 
             if updated_event.is_free:
                 updated_event.save()
+                logger.info(f"Event {event.id} was updated by {request.user.id}")
                 messages.success(request, "Event was updated.")
                 return redirect("event_detail", pk=pk)
             else:
@@ -159,6 +166,7 @@ def event_delete(request, pk):
     event = get_object_or_404(Event, pk=pk, created_by=request.user)
     if request.method == "POST":
         event.delete()
+        logger.info(f"Event {event.id} deleted by {request.user.id}")
         messages.success(request, "Event was deleted.")
         return redirect("account_detail")
     return render(request, "event_delete.html", {"event": event})
@@ -206,10 +214,12 @@ def buy_ticket(request, pk):
                         "images": [event.get_banner_url()],
                     },
                 )
-
+                logger.info(
+                    f"User {request.user.id} started payment on ticket {event.ticket.id} for {quantity} qty."
+                )
                 return redirect(checkout_url)
             except stripe.error.StripeError as e:
-                logging.error(f"Stripe error: {e}")
+                logger.error(f"Stripe error: {e}")
                 messages.error(
                     request,
                     "There was an error processing your payment. Please try again.",
@@ -241,9 +251,7 @@ def payment_success(request, pk):
         request,
         f"Purchased {quantity} tickets for {event.title}.",
     )
-    logging.info(
-        "Purchase successful: user " f"{request.user} bought {quantity} tickets for {event} "
-    )
+    logger.info(f"User {request.user.id} purchased successfully {quantity} tickets for {event}")
     return redirect("purchase_detail", pk=purchase.pk)
 
 
