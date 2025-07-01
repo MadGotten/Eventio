@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load cache %}
 
 {% block base_content %}
     <div class="min-h-[25dvh] text-lg md:text-xl flex items-center">
@@ -21,6 +22,7 @@
                 type="submit">Search</button>
     </form>
     <div class="w-full flex flex-col">
+    {% cache 300 event_list %}
         {% if popular %}
             <h2 class="text-2xl sm:text-3xl">Popular Events</h2>
             <div class="flex flex-row flex-wrap gap-4 lg:gap-6 justify-center">
@@ -37,5 +39,6 @@
             <h2 class="text-2xl sm:text-3xl">Recent Events</h2>
             <div class="flex flex-row flex-wrap gap-6 justify-center">{% include 'partials/_recent_events.html' %}</div>
         {% endif %}
+    {% endcache %}
     </div>
 {% endblock %}
