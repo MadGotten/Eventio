@@ -18,4 +18,12 @@
     .box-shadow {
         @apply shadow-[4px_4px_0px_0px_rgba(0,0,0,1)];
     }
+
+    .btn-base {
+        @apply rounded no-underline border-2 focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:translate-y-0.5 focus:translate-x-0.5 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.9)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)];
+    }
+
+    .btn-icon {
+        @apply rounded no-underline border-2 border-black
+    }
 }

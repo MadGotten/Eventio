@@ -28,3 +28,8 @@ input[type=checkbox] {
 input[type=number]::-webkit-inner-spin-button {
     opacity: 1
 }
+
+.modal-backdrop {
+    background-color: oklch(10% 0 0);
+    opacity: 0.75;
+}

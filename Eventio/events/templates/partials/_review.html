@@ -1,9 +1,16 @@
 {% load filter_range %}
 
-<div class="p-2 border-black border-2 rounded box-shadow w-full">
+<div id="review-{{ review.id }}" class="p-2 border-black border-2 rounded box-shadow w-full">
     <div class="flex flex-row justify-between mb-1">
         <p class="m-0 font-semibold">{{review.user}}</p>
-        <p class="m-0">{{review.created_at|date:"d.m.Y"}}</p>
+        <div class="flex gap-2 items-center">
+            <p class="m-0">{{review.created_at|date:"d.m.Y"}}</p>
+            {% if request.user == review.user %}
+                <button id="confirmDelete" hx-get="{% url 'review_delete' review.id %}" hx-target="body" hx-swap="beforeend" class="btn-icon text-black bg-red-500 hover:bg-red-700">
+                    <i data-lucide="x" width="20" height="20"></i>
+                </button>
+            {% endif %}
+        </div>
     </div>
     <div class="flex items-center">
         {% for i in 5|range %}
@@ -16,7 +23,7 @@
 </div>
 
 {% if request.htmx and not hideMessages %}
-    <div id="review_form" class="bg-green-500 rounded text-center font-semibold p-4 text-black box-shadow border-black border-2" hx-swap-oob="true" hx-swap="innerHTML">
+    <div x-ref="reviewSuccess" x-data="{}" x-init="setTimeout(() => $refs.reviewSuccess.remove(), 3000)" id="review_form"  class="bg-green-500 rounded text-center font-semibold p-4 text-black box-shadow border-black border-2" hx-swap-oob="true" hx-swap="innerHTML">
         Thank you for submitting your Review
     </div>
     {% if messages %}
@@ -25,3 +32,10 @@
         </section>
     {% endif %}
 {% endif %}
+
+{% block script %}
+    <script>
+        // Reload again icons for htmx loaded html
+        lucide.createIcons();
+    </script>
+{% endblock %}
