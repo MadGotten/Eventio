@@ -1,12 +1,9 @@
-import logging
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from events.helpers import validate_image
 from django.conf import settings
-
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
 
 class EventQueryset(models.QuerySet):

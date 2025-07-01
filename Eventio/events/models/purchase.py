@@ -1,8 +1,5 @@
-import logging
 from django.db import models
 from django.contrib.auth.models import User
-
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
 
 class Purchase(models.Model):

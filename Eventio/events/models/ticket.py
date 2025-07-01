@@ -1,10 +1,7 @@
-import logging
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, IntegrityError, transaction
 from django.db.models import F
 from events.models import Purchase
-
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
 
 class Ticket(models.Model):
