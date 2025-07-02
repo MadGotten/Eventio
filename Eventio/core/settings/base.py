@@ -176,4 +176,4 @@ PASSWORD_HASHERS = [
 STRIPE_API_PUBLIC = os.environ.get("STRIPE_API_PUBLIC")
 STRIPE_API_SECRET = os.environ.get("STRIPE_API_SECRET")
 
-STATIC_HOST = os.environ.get("STATIC_HOST")
+STATIC_HOST = os.environ.get("STATIC_HOST", "")
