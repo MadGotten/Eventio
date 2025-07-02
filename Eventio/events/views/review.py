@@ -18,11 +18,7 @@ def review_create(request, pk):
         review.event = event
         review.save()
         messages.success(request, "Review was submitted.")
-        return render(
-            request,
-            "partials/_review.html",
-            {"review": review},
-        )
+        return render(request, "partials/_review.html", {"review": review}, status=201)
 
     return redirect("event_detail", pk=pk)
 

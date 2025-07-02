@@ -1,8 +1,9 @@
+from django.conf import settings
 from django.test import TestCase, override_settings
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core.files.uploadedfile import SimpleUploadedFile
-from events.models import Event, Registration
+from events.models import Event, Registration, Purchase, Ticket, Review
 from django.db.utils import IntegrityError
 from django.db import transaction
 import uuid
@@ -13,9 +14,9 @@ import io
 @override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
 class EventModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create(username="testuser")
+        self.user = User.objects.create(username="user")
+        self.user2 = User.objects.create(username="user2")
         self.super_user = User.objects.create(username="superuser", is_staff=True)
-        self.second_user = User.objects.create(username="secondtestuser")
 
         self.mock_image = SimpleUploadedFile(
             name="test_image.jpg",
@@ -34,8 +35,8 @@ class EventModelTest(TestCase):
 
     def tearDown(self):
         self.user.delete()
+        self.user2.delete()
         self.super_user.delete()
-        self.second_user.delete()
         self.event.delete()
 
     def create_test_image(self, mode="RGB", format="JPEG"):
@@ -61,10 +62,15 @@ class EventModelTest(TestCase):
         self.assertTrue(self.event.is_free)
         self.assertFalse(self.event.is_paid)
 
+    def test_event_is_paid_property(self):
+        self.event.event_type = "paid"
+        self.assertTrue(self.event.is_paid)
+        self.assertFalse(self.event.is_free)
+
     def test_is_allowed_to_view(self):
         self.assertTrue(self.event.is_allowed_to_view(self.user))
         self.assertTrue(self.event.is_allowed_to_view(self.super_user))
-        self.assertFalse(self.event.is_allowed_to_view(self.second_user))
+        self.assertFalse(self.event.is_allowed_to_view(self.user2))
 
     def test_get_absolute_url(self):
         self.assertEqual(self.event.get_absolute_url(), f"/event/{self.event.id}/")
@@ -115,11 +121,27 @@ class EventModelTest(TestCase):
     def test_event_status_default(self):
         self.assertEqual(self.event.status, "pending")
 
+    def test_get_banner_url_returns_none_if_no_banner(self):
+        event = Event.objects.create(
+            title="Test Event",
+            description="Event Description",
+            location="Test Location",
+            date=timezone.now(),
+            banner=None,
+            created_by=self.user,
+        )
 
+        self.assertIsNone(event.get_banner_url())
+
+    def test_get_banner_url_returns_banner_url(self):
+        self.assertEqual(self.event.get_banner_url(), settings.STATIC_HOST + self.event.banner.url)
+
+
+@override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
 class RegistrationModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create(username="testuser")
-        self.second_user = User.objects.create(username="seconduser")
+        self.user = User.objects.create(username="user")
+        self.user2 = User.objects.create(username="user2")
 
         self.event = Event.objects.create(
             title="Test Event",
@@ -132,7 +154,7 @@ class RegistrationModelTest(TestCase):
 
     def tearDown(self):
         self.user.delete()
-        self.second_user.delete()
+        self.user2.delete()
         self.event.delete()
         self.registration.delete()
 
@@ -152,6 +174,107 @@ class RegistrationModelTest(TestCase):
                 Registration.objects.create(user=self.user, event=self.event)
 
     def test_different_users_can_register_for_same_event(self):
-        registration2 = Registration.objects.create(user=self.second_user, event=self.event)
-        self.assertEqual(registration2.user, self.second_user)
+        registration2 = Registration.objects.create(user=self.user2, event=self.event)
+        self.assertEqual(registration2.user, self.user2)
         self.assertEqual(registration2.event, self.event)
+
+
+@override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
+class PurchaseModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(username="user")
+        self.event = Event.objects.create(
+            title="Test Event",
+            description="Event Description",
+            location="Test Location",
+            date=timezone.now(),
+            created_by=self.user,
+        )
+        self.ticket = Ticket.objects.create(price=10, quantity=1, event=self.event)
+        self.purchase = Purchase.objects.create(user=self.user, ticket=self.ticket, quantity=1)
+
+    def tearDown(self):
+        self.user.delete()
+        self.event.delete()
+        self.ticket.delete()
+        self.purchase.delete()
+
+    def test_purchase_creation(self):
+        self.assertEqual(self.purchase.user, self.user)
+        self.assertEqual(self.purchase.ticket, self.ticket)
+        self.assertEqual(self.purchase.quantity, 1)
+        self.assertTrue(isinstance(self.purchase.purchased_at, timezone.datetime))
+
+    def test_purchase_str_method(self):
+        self.assertEqual(
+            str(self.purchase), f"{self.user.username} bought ticket for {self.ticket.event.title}"
+        )
+
+    def test_purchase_total_property_with_quantity_1(self):
+        self.assertEqual(self.purchase.total, 10)
+
+    def test_purchase_total_property_with_quantity_7(self):
+        self.purchase.quantity = 7
+        self.assertEqual(self.purchase.total, 70)
+
+
+@override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
+class ReviewModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(username="user")
+        self.event = Event.objects.create(
+            title="Test Event",
+            description="Event Description",
+            location="Test Location",
+            date=timezone.now(),
+            created_by=self.user,
+        )
+        self.review = Review.objects.create(
+            user=self.user, event=self.event, rating=5, comment="Good"
+        )
+
+    def tearDown(self):
+        self.user.delete()
+        self.event.delete()
+
+    def test_review_str_return(self):
+        self.assertEqual(
+            str(self.review),
+            f"Review by {self.user.username} for {self.event.title} - {self.review.rating}",
+        )
+
+
+@override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
+class TicketModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(username="user")
+        self.event = Event.objects.create(
+            title="Test Event",
+            description="Event Description",
+            location="Test Location",
+            date=timezone.now(),
+            created_by=self.user,
+        )
+        self.ticket = Ticket.objects.create(price=10, quantity=10, event=self.event)
+
+    def tearDown(self):
+        self.user.delete()
+        self.ticket.delete()
+
+    def test_ticket_property_price_to_cents(self):
+        self.ticket.price = 42.21
+        self.assertEqual(self.ticket.price_to_cents, 4221)
+
+    def test_ticket_buy_method_with_quantity_of_1(self):
+        self.ticket.buy(self.user, self.event, 1)
+        self.ticket.refresh_from_db()
+        self.assertEqual(self.ticket.quantity, 9)
+        self.assertEqual(self.ticket.purchase_set.count(), 1)
+        self.assertEqual(self.ticket.purchase_set.first().user, self.user)
+
+    def test_ticket_buy_method_with_quantity_4(self):
+        self.ticket.buy(self.user, self.event, 4)
+        self.ticket.refresh_from_db()
+        self.assertEqual(self.ticket.quantity, 6)
+        self.assertEqual(self.ticket.purchase_set.count(), 1)
+        self.assertEqual(self.ticket.purchase_set.first().user, self.user)
