@@ -145,7 +145,14 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_URL = "static/"
+
 STATIC_ROOT = "staticfiles/"
+
+# Static files root folder it only needs to be created to suppress test warnings about whitenoise middleware not finding it
+STATIC_ROOT_FOLDER = BASE_DIR / STATIC_ROOT
+
+if not STATIC_ROOT_FOLDER.exists():
+    STATIC_ROOT_FOLDER.mkdir(exist_ok=True, parents=True)
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = "media/"
