@@ -50,7 +50,7 @@ def event_detail(request, pk):
     if event.is_paid and not event.is_active:
         if user.is_anonymous or not event.is_allowed_to_view(user):
             logger.warning(
-                f"User {user.id if user.is_authenticated else "anonymous"} tried to view event {event.id} that is paid and not active"
+                f"User {user.id if user.is_authenticated else 'anonymous'} tried to view event {event.id} that is paid and not active"
             )
             raise Http404()
 
