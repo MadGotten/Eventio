@@ -1,5 +1,7 @@
 import logging
 from django.conf import settings
+from django.db.models import Avg, Count
+from django.db.models.functions import Round
 from django.http import Http404, HttpResponse
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
@@ -37,8 +39,13 @@ def event_list(request):
 
 def event_detail(request, pk):
     user = request.user
-    event = get_object_or_404(Event.objects.select_related("created_by"), pk=pk)
-    reviews = paginate_queryset(request, event.reviews.all(), per_page=4)
+    event = get_object_or_404(
+        Event.objects.select_related("created_by").annotate(
+            avg_rating=Round(Avg("reviews__rating"), 2), review_count=Count("reviews")
+        ),
+        pk=pk,
+    )
+    reviews = paginate_queryset(request, event.reviews.all().select_related("user"), per_page=4)
 
     if request.htmx:
         return render(

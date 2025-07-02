@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load filter_range %}
+{% load helpers %}
 
 {% block title %}- {{ event.title }}{% endblock %}
 
@@ -62,7 +64,20 @@
             </div>
         {% endif %}
         <div class="flex flex-col w-full">
-            <h3 class="mb-1">Reviews</h3>
+            <div class="flex flex-row gap-2 items-end mt-8 mb-1">
+                <h3 class="m-0 leading-none">Reviews</h3>
+                <div class="flex items-end gap-1 leading-none">
+                    <span class="font-medium">{{ event.avg_rating|default:"0.00" }}</span>
+                    <div class="flex">
+                         {% for i in 5|range %}
+                            <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" class="w-[1.125rem] h-[1.125rem] {% if event.avg_rating|round > i %}text-amber-500{% else %}text-neutral-400{% endif %}">
+                                <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" />
+                            </svg>
+                        {% endfor %}
+                    </div>
+                    <span class="text-sm text-neutral-500 leading-[1.125rem]">({{ event.review_count }})</span>
+                </div>
+            </div>
 
             {% if not has_reviewed %}
                 {% if has_joined %}
