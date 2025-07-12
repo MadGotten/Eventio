@@ -5,7 +5,7 @@ Eventio is a web application designed for managing events, allowing users to cre
 
 ## Features
 - **User Authentication**: Users can register, log in, and manage their accounts.
-- **Event Management**: Create, update, and delete events with different statuses (approved, pending).
+- **Event Management**: Create, update and delete events with different statuses (approved, pending).
 - **Review System**: Users can submit reviews to events they've been.
 - **Ticketing System**: Users can buy tickets for paid events and register for free events.
 - **Event Search**: Search for events based on title and description.
@@ -37,9 +37,9 @@ source venv/bin/activate
 ```bash
 pip install -r development.txt
 ```
-4. Install Tailwind CLI or add Tailwind CDN for development
+4. Install Node modules dependencies for development
 ```bash
-npm install -D tailwindcss
+npm install
 ```
 5. Set up the database:
 - Create a PostgreSQL database and user.
@@ -56,9 +56,9 @@ python manage.py createsuperuser
 ```bash
 python manage.py runserver
 ```
-9. When using Tailwind CLI start build process:
+9. Run watch or minify changes in tailwindcss file:
 ```bash
-npx tailwindcss -i Eventio/static/css/input.css -o Eventio/static/css/output.css --watch
+npm run watch | npm run build
 ```
 Open your browser and go to http://127.0.0.1:8000/.
 

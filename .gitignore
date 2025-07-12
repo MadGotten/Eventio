@@ -8,6 +8,8 @@ __pycache__
 db.sqlite3
 media
 database
+node_modules
+*/static/css/output.css
 
 # IDE settings
 .idea

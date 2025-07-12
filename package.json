@@ -1,0 +1,15 @@
+{
+  "name": "eventio",
+  "version": "1.0.0",
+  "description": "",
+  "main": "tailwind.config.js",
+  "scripts": {
+    "build": "npx tailwindcss -i Eventio/static/css/input.css -o Eventio/static/css/output.css --minify",
+    "watch": "npx tailwindcss -i Eventio/static/css/input.css -o Eventio/static/css/output.css --watch"
+  },
+  "author": "Marek Stefaniak",
+  "license": "ISC",
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}
