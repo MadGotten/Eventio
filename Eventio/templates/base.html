@@ -25,7 +25,7 @@
     </script>
     {% endif %}
   </head>
-  <body class="min-h-dvh w-full overflow-x-hidden flex flex-col">
+  <body class="min-h-dvh w-full overflow-x-hidden flex flex-col" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     {% include 'navbar.html' %}
     <div class="flex justify-center flex-1 flex-grow">
       <main class="max-w-screen-xl flex flex-col items-center prose mt-[104px] px-4 pb-8 w-full">
