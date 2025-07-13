@@ -14,6 +14,11 @@
             </label>
         {% endfor %}
     </div>
-    {% render_field review_form.comment placeholder="Review" class="p-4 focus:!border-black focus:ring-0 border-2 rounded font-medium placeholder-shown:!border-[#6b7280] border-black valid:border-black invalid:border-red-500" %}
+    {% render_field review_form.comment placeholder="Review" class='p-4 focus:!border-black focus:ring-0 border-2 rounded font-medium placeholder-shown:!border-[#6b7280] border-black valid:border-black aria-[invalid=true]:!border-red-500' %}
+    {% if review_form.comment.errors %}
+        <div class="prose-sm !text-red-500">
+            {{review_form.comment.errors}}
+        </div>
+    {% endif %}
     <button type="submit" class="btn btn-primary">Submit Review</button>
 </form>
