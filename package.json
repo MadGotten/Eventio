@@ -10,6 +10,7 @@
   "author": "Marek Stefaniak",
   "license": "ISC",
   "devDependencies": {
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "@tailwindcss/typography": "^0.5.16"
   }
 }
