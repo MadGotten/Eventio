@@ -51,9 +51,7 @@ class ReviewViewsTest(TestCase):
             reverse("review_create", kwargs={"pk": self.event.id}),
             {"rating": 8, "comment": "Good"},
         )
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(
-            response,
-            reverse("event_detail", kwargs={"pk": self.event.id}),
-            fetch_redirect_response=False,
-        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "partials/_review_form.html")
+        self.assertTrue(response.has_header("HX-Retarget"))
+        self.assertTrue(response.has_header("HX-Reswap"))

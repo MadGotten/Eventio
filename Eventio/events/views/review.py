@@ -20,9 +20,14 @@ def review_create(request, pk):
             messages.success(request, "Review was submitted.")
             return render(request, "partials/_review.html", {"review": review}, status=201)
 
-    return render(
-        request, "partials/_review_form.html", {"review_form": review_form, "event": event}
+    response = render(
+        request,
+        "partials/_review_form.html",
+        {"review_form": review_form, "event": event},
     )
+    response["HX-Retarget"] = "#review_form"
+    response["HX-Reswap"] = "outerHTML"
+    return response
 
 
 @login_required
