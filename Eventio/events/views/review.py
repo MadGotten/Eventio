@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from events.models import Event, Review
 from events.forms import ReviewForm
-from django_htmx.http import HttpResponseClientRefresh
+from django_htmx.http import HttpResponseClientRefresh, reswap, retarget
 
 
 @login_required
@@ -24,10 +24,10 @@ def review_create(request, pk):
         request,
         "partials/_review_form.html",
         {"review_form": review_form, "event": event},
+        status=200 if not review_form.is_bound else 400,
     )
-    response["HX-Retarget"] = "#review_form"
-    response["HX-Reswap"] = "outerHTML"
-    return response
+
+    return reswap(retarget(response, "#review_form"), "outerHTML")
 
 
 @login_required
