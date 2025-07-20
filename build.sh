@@ -2,8 +2,11 @@
 # Exit on error
 set -o errexit
 
+# Install uv
+pip install uv
+
 # Install production dependencies
-pip install -r production.txt
+uv sync --locked
 
 # Move to django project app
 cd Eventio
