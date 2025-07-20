@@ -28,4 +28,4 @@ jobs:
       run: uv sync --locked
     - name: Run Tests
       working-directory: ./Eventio
-      run: uv run manage.py tests
+      run: uv run manage.py test
