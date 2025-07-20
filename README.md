@@ -28,14 +28,10 @@ Eventio is a web application designed for managing events, allowing users to cre
 git clone https://github.com/yourusername/eventio.git
 cd eventio
 ```
-2. Create a virtual environment:
+2. Prerequisite installed [uv](https://docs.astral.sh/uv/getting-started/installation/)
+3. Install dependencies using uv:
 ```bash
-python -m venv .venv
-source venv/bin/activate
-```
-3. Install the required packages:
-```bash
-pip install -r development.txt
+uv sync
 ```
 4. Install Node modules dependencies for development
 ```bash
