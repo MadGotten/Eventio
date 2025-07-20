@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}- About{% endblock %}
+
+{% block base_content %}
+    <div class="flex flex-col max-w-xs">
+        <h2>Thanks for sending a contact email</h2>
+        <a href="{% url 'event_list' %}" class="btn-link-secondary w-fit flex items-center gap-1">Go back</a>
+    </div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}- About{% endblock %}
+
+{% block base_content %}
+    <div class="flex flex-col max-w-screen-sm flex-grow flex-shrink-0">
+        <h1>About Eventio</h1>
+        <p class="mt-0">
+            Eventio is a simple and powerful event management platform built to make organizing and attending events easier than ever.
+            Whether you're hosting a local workshop, a community meetup, or a large-scale conference,
+            Eventio helps you manage every aspect of your event in one place.
+        </p>
+        <h2>Why Eventio</h2>
+        <p>
+            Managing events shouldn’t be complicated. Eventio takes care of the details so you can focus on what matters —
+            creating great experiences. With intuitive tools and a user-friendly design,
+            Eventio helps event organizers streamline event creation and helps attendees easily discover and join events that interest them.
+        </p>
+        <h3>Key Features</h3>
+        <div class="grid grid-cols-[repeat(1,_minmax(0,_280px))] sm:grid-cols-[repeat(2,260px)] gap-4 grid-rows-2 justify-center text-black">
+            <div class="feature-card bg-orange-300">
+                <div class="btn-icon bg-orange-400 p-2"><i data-lucide="ticket-check"></i></div>
+                <p class="m-0">Create and manage your events with ease. Eventio supports different event statuses, giving you full control.</p>
+            </div>
+            <div class="feature-card bg-green-300">
+                <div class="btn-icon bg-green-400 p-2"><i data-lucide="shield-check"></i></div>
+                <p class="m-0">Secure sign-up and login system, allowing users to manage their accounts.</p>
+            </div>
+            <div class="feature-card bg-blue-300">
+                <div class="btn-icon bg-blue-400 p-2"><i data-lucide="star"></i></div>
+                <p class="m-0">Attendees can leave reviews after participating, helping build trust and community feedback.</p>
+            </div>
+            <div class="feature-card bg-purple-300">
+                <div class="btn-icon bg-purple-400 p-2"><i data-lucide="banknote"></i></div>
+                <p class="m-0">Offer both free registrations and paid ticket options with a simple checkout process.</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

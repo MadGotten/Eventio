@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% load widget_tweaks %}
+
+{% block title %}- Contact{% endblock %}
+
+{% block base_content %}
+    <div class="flex flex-col max-w-sm w-full flex-grow flex-shrink-0">
+        <h1>Contact</h1>
+         <form method="post" class="flex flex-col gap-2">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="flex flex-col">
+                    <label for="{{ field.id_for_label }}" class="font-bold">{{ field.label }}</label>
+                    {% render_field field class="p-3 focus:!border-black focus:ring-0 border-2 rounded font-medium placeholder-shown:!border-[#6b7280] border-black valid:border-black aria-[invalid=true]:!border-red-500" %}
+                    {% if field.errors %}<div class="prose-sm !text-red-500">{{ field.errors }}</div>{% endif %}
+                </div>
+            {% endfor %}
+            <button class="btn-primary" type="submit">Save</button>
+        </form>
+    </div>
+{% endblock %}

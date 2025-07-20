@@ -16,10 +16,14 @@ Including another URLconf
 """
 
 from django.urls import path
+from django.views.generic import TemplateView
 from . import views
 
 urlpatterns = [
     path("", views.event.event_list, name="event_list"),
+    path("about/", TemplateView.as_view(template_name="about.html"), name="about"),
+    path("contact/", views.event.ContactFormView.as_view(), name="contact"),
+    path("thanks/", TemplateView.as_view(template_name="thanks.html"), name="thanks"),
     path("accounts/", views.account.account_detail, name="account_detail"),
     path("accounts/delete/", views.account.account_delete, name="account_delete"),
     path("event/", views.event.event_create, name="event_create"),

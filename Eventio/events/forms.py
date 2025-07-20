@@ -49,3 +49,8 @@ class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
         fields = ("rating", "comment")
+
+
+class ContactForm(forms.Form):
+    email = forms.EmailField(label="Email")
+    message = forms.CharField(label="Message", widget=forms.Textarea({"cols": 40, "rows": 6}))

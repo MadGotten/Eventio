@@ -26,4 +26,8 @@
     .btn-icon {
         @apply rounded no-underline border-2 border-black
     }
+
+    .feature-card {
+        @apply relative p-4 pt-2 border-black border-2 box-shadow flex flex-col justify-start items-center gap-4
+    }
 }

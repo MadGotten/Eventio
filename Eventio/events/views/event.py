@@ -1,5 +1,6 @@
 import logging
 from django.conf import settings
+from django.core.mail import send_mail
 from django.db.models import Avg, Count
 from django.db.models.functions import Round
 from django.http import Http404, HttpResponse
@@ -10,9 +11,11 @@ from django.contrib import messages
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 import stripe
+from django.views.generic import FormView
+
 from events.models import Event, Registration, Ticket, Purchase, Review
 from django.core.exceptions import ObjectDoesNotExist
-from events.forms import EventForm, TicketForm, BuyTicketForm, ReviewForm
+from events.forms import EventForm, TicketForm, BuyTicketForm, ReviewForm, ContactForm
 from events import payment
 
 logger = logging.getLogger(__name__)
@@ -290,3 +293,18 @@ def event_search(request):
         )
 
     return render(request, "event_search.html", {"events": event_obj, "query": query})
+
+
+class ContactFormView(FormView):
+    template_name = "contact.html"
+    form_class = ContactForm
+    success_url = "/thanks/"
+
+    def form_valid(self, form):
+        send_mail(
+            subject="Contact Form",
+            message=form.cleaned_data["message"],
+            from_email=form.cleaned_data["email"],
+            recipient_list=[f"{form.cleaned_data["email"]}"],
+        )
+        return super().form_valid(form)
