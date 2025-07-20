@@ -4,7 +4,7 @@
 
 {% block base_content %}
     <h2>Buy ticket for {{ event.title }}</h2>
-    <div class="bg-blue-600 text-white p-4 rounded border-2 border-black box-shadow w-80">
+    <div class="bg-blue-600 relative text-white p-3 px-6 rounded border-2 border-black box-shadow w-80 ticket">
         <p class="m-0 mb-1 text-lg">Event: {{ event.title }}</p>
         <p class="m-0 mb-1">Ticket price: {{ event.ticket.price }}$</p>
         <p class="m-0 text-sm text-gray-200">Starts at: {{ event.date|date:"d.m.Y H:i" }}</p>

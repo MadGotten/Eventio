@@ -33,3 +33,27 @@ input[type=number]::-webkit-inner-spin-button {
     background-color: oklch(10% 0 0);
     opacity: 0.75;
 }
+
+.ticket:before,
+.ticket:after {
+    content:"";
+    display: block;
+    position: absolute;
+    top: 37px;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: white;
+    z-index: 2;
+    border: 2px solid black;
+}
+
+.ticket:before {
+    left: -20px;
+    clip-path: circle(65% at 100% 50%);
+}
+
+.ticket:after {
+    right: -20px;
+    clip-path: circle(74% at 0 50%);
+}
