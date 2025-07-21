@@ -1,12 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}- Detail purchase{{purchase.ticket.event.title}}{% endblock %}
+{% block title %}- Detail purchase {{purchase.event_name}}{% endblock %}
 
 {% block base_content %}
-    <h2>Purchase for {{purchase.ticket.event.title}}</h2>
+    <h2>Purchase for {{purchase.event_name}}</h2>
     <div class="flex flex-col gap-3">
         <p class="m-0">User: {{purchase.user}}</p>
-        <p class="m-0">Ticket price: {{purchase.ticket.price}}$</p>
         <p class="m-0">Total price: {{purchase.total}}$</p>
         <p class="m-0">Quantity: {{purchase.quantity}}</p>
         <p class="m-0">Bought at: {{purchase.purchased_at|date:"d.m.Y H:i"}}</p>

@@ -3,7 +3,7 @@
         <li class="shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 border-black border-2 bg-neoviolet hover:bg-neoviolet-hover flex flex-col gap-2 w-44 sm:w-48">
             <span>{{ purchase.user }}</span>
             <div class="flex justify-between">
-                <span>{{ purchase.ticket.event.title }}</span>
+                <span>{{ purchase.event_name }}</span>
                 <span>{{ purchase.total }}$</span>
             </div>
             <span class="font-normal text-sm">{{ purchase.purchased_at|date:"d.m.Y H:i" }}</span>

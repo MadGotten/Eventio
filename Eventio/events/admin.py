@@ -36,7 +36,7 @@ class ReviewAdmin(admin.ModelAdmin):
 
 @admin.register(Purchase)
 class PurchaseAdmin(admin.ModelAdmin):
-    list_display = ("ticket", "user")
+    list_display = ("ticket", "user", "event_name", "amount_paid")
     search_fields = ("user",)
     list_filter = ("purchased_at",)
     readonly_fields = ("purchased_at",)

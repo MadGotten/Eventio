@@ -191,7 +191,13 @@ class PurchaseModelTest(TestCase):
             created_by=self.user,
         )
         self.ticket = Ticket.objects.create(price=10, quantity=1, event=self.event)
-        self.purchase = Purchase.objects.create(user=self.user, ticket=self.ticket, quantity=1)
+        self.purchase = Purchase.objects.create(
+            user=self.user,
+            ticket=self.ticket,
+            quantity=1,
+            event_name=self.event.title,
+            amount_paid=self.ticket.price_to_cents,
+        )
 
     def tearDown(self):
         self.user.delete()
@@ -203,6 +209,8 @@ class PurchaseModelTest(TestCase):
         self.assertEqual(self.purchase.user, self.user)
         self.assertEqual(self.purchase.ticket, self.ticket)
         self.assertEqual(self.purchase.quantity, 1)
+        self.assertEqual(self.purchase.event_name, self.event.title)
+        self.assertEqual(self.purchase.amount_paid, self.ticket.price_to_cents)
         self.assertTrue(isinstance(self.purchase.purchased_at, timezone.datetime))
 
     def test_purchase_str_method(self):
@@ -210,12 +218,18 @@ class PurchaseModelTest(TestCase):
             str(self.purchase), f"{self.user.username} bought ticket for {self.ticket.event.title}"
         )
 
-    def test_purchase_total_property_with_quantity_1(self):
-        self.assertEqual(self.purchase.total, 10)
+    def test_purchase_total_property_formats_correct(self):
+        self.assertTrue(isinstance(self.purchase.total, str))
+        self.assertEqual(self.purchase.total, "10.00")
 
-    def test_purchase_total_property_with_quantity_7(self):
-        self.purchase.quantity = 7
-        self.assertEqual(self.purchase.total, 70)
+    def test_purchase_total_property_formats_correct_with_arbitrary_amount(self):
+        self.purchase.amount_paid = 583021
+        self.assertTrue(isinstance(self.purchase.total, str))
+        self.assertEqual(self.purchase.total, "5830.21")
+
+    # def test_purchase_total_property_with_quantity_7(self):
+    #    self.purchase.quantity = 7
+    #    self.assertEqual(self.purchase.total, 70)
 
 
 @override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])

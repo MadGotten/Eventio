@@ -21,7 +21,7 @@ class Ticket(models.Model):
 
     @staticmethod
     @transaction.atomic
-    def buy(user, event, quantity):
+    def buy(user, event, quantity, amount_paid=0):
         ticket = Ticket.objects.select_for_update().get(event=event)
 
         if ticket.quantity <= 0 or ticket.quantity < quantity:
@@ -30,7 +30,13 @@ class Ticket(models.Model):
         ticket.quantity = F("quantity") - quantity
         ticket.save()
 
-        purchase = Purchase.objects.create(ticket=ticket, user=user, quantity=quantity)
+        purchase = Purchase.objects.create(
+            ticket=ticket,
+            user=user,
+            quantity=quantity,
+            event_name=event.title,
+            amount_paid=amount_paid,
+        )
         return purchase
 
     def __str__(self):

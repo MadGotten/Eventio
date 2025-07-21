@@ -249,6 +249,7 @@ def payment_success(request, pk):
     checkout_session = payment.get_checkout_session(session_id)
 
     quantity = int(checkout_session.metadata.get("quantity", 1))
+    amount_paid = int(checkout_session.amount_total)
 
     try:
         event = Event.objects.get(pk=pk)
@@ -256,7 +257,7 @@ def payment_success(request, pk):
         messages.error(request, "Event not found.")
         return redirect("event_list")
 
-    purchase = Ticket.buy(request.user, event, quantity)
+    purchase = Ticket.buy(request.user, event, quantity, amount_paid)
     messages.success(
         request,
         f"Purchased {quantity} tickets for {event.title}.",
