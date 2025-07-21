@@ -21,4 +21,4 @@ npm run build
 python manage.py collectstatic --no-input
 
 # Apply database migrations
-python manage.py migrate
+python manage.py migrate --settings=core.settings.production
